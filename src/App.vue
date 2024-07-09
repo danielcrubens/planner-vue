@@ -66,14 +66,28 @@
             class="flex items-center gap-2 flex-1 text-left"
           >
             <UserRoundPlus class="size-5 text-zinc-400" />
-            <span class="text-zinc-400 text-lg flex-1"
-              >Quem estará na viagem?</span
+            <span
+              v-if="emailsToInvite.length > 0"
+              :class="{
+                'text-zinc-500 text-lg flex-1': emailsToInvite.length > 0,
+              }"
             >
+              {{ emailsToInvite.length }} pessoa(s) convidada(s)
+            </span>
+            <span
+              v-else
+              :class="{
+                'text-zinc-400 text-lg flex-1': !emailsToInvite.length,
+              }"
+            >
+              Quem estará na viagem?
+            </span>
           </button>
 
           <div class="w-px h-6 bg-zinc-800" />
 
           <button
+            @click="openConfirmTripModal"
             class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
           >
             Confirmar viagem
@@ -156,10 +170,74 @@
       v-if="emailAlreadyAdded"
       class="fixed mx-auto top-5 inset-x-0 bg-red/60 max-w-sm w-full"
     >
-      <div role="alert" class="rounded-xl border-s-4 border-red-500 bg-red-50 p-4">
+      <div
+        role="alert"
+        class="rounded-xl border-s-4 border-red-500 bg-red-50 p-4"
+      >
         <strong class="block font-bold text-red-800 text-center">
           Este e-mail já foi adicionado!
         </strong>
+      </div>
+    </div>
+
+    <div
+      v-if="isConfirmTripModalOpen"
+      class="fixed inset-0 bg-black/60 flex items-center justify-center"
+    >
+      <div
+        class="w-[640px] rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5"
+      >
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h2 class="font-lg font-semibold">Confirmar criação de viagem</h2>
+            <button>
+              <X class="size-5 text-zinc-400" @click="closeConfirmTripModal" />
+            </button>
+          </div>
+          <p class="text-sm text-zinc-400">
+            Para concluir a criação da viagem para
+            <span class="font-semibold text-zinc-100"
+              >Florianópolis, Brasil</span
+            >
+            nas datas de
+            <span class="font-semibold text-zinc-100"
+              >16 a 27 de Agosto de 2024</span
+            >
+            preencha seus dados abaixo:
+          </p>
+        </div>
+        <form onSubmit="{createTrip}" class="space-y-3">
+          <div
+            class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2"
+          >
+            <User class="text-zinc-400 size-5" />
+            <input
+              type="text"
+              name="name"
+              placeholder="Seu nome completo"
+              class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
+            />
+          </div>
+
+          <div
+            class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2"
+          >
+            <Mail class="text-zinc-400 size-5" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Seu e-mail pessoal"
+              class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
+            />
+          </div>
+
+          <button
+            class="bg-lime-300 w-full text-center text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center justify-center gap-2 hover:bg-lime-400"
+            type="submit"
+          >
+            Confirmar criação da viagem
+          </button>
+        </form>
       </div>
     </div>
   </div>
@@ -176,7 +254,9 @@ import {
   Settings2,
   UserRoundPlus,
   X,
-} from "lucide-vue-next"; 
+  User,
+  Mail,
+} from "lucide-vue-next";
 
 const isGuestsInputOpen = ref(false);
 const isGuestsModalOpen = ref(false);
@@ -184,6 +264,7 @@ const destination = ref("");
 const date = ref("");
 const newEmail = ref("");
 const emailsToInvite = ref(["daniel@rubens.com.br", "john@acme.com"]);
+const isConfirmTripModalOpen = ref(false);
 
 const openGuestsInput = () => {
   isGuestsInputOpen.value = true;
@@ -197,6 +278,12 @@ const openGuestsModal = () => {
 const closeGuestsModal = () => {
   isGuestsModalOpen.value = false;
 };
+const openConfirmTripModal = () => {
+  isConfirmTripModalOpen.value = true;
+};
+const closeConfirmTripModal = () => {
+  isConfirmTripModalOpen.value = false;
+};
 const emailAlreadyAdded = ref(false);
 
 const addNewEmailToInvite = (event) => {
@@ -207,7 +294,7 @@ const addNewEmailToInvite = (event) => {
     emailAlreadyAdded.value = true;
     setTimeout(() => {
       emailAlreadyAdded.value = false;
-    }, 3000); 
+    }, 3000);
     return;
   }
 
