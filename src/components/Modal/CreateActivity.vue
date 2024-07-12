@@ -23,7 +23,7 @@
             <input type="datetime-local" name="occurs_at" placeholder="Data e horário da atividade"
               class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
           </div>
-          <Button variant="primary">
+          <Button variant="primary" size="full">
            Salvar atividade
           </Button>
         </form>
