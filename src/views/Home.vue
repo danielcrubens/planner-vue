@@ -9,54 +9,19 @@
       </div>
 
       <div class="space-y-4">
-        <div class="h-16 bg-zinc-900 px-4 rounded-xl flex items-center shadow-shape gap-3">
-          <div class="flex items-center gap-2 flex-1">
-            <MapPin class="size-5 text-zinc-400" />
-            <input v-model="destination" :disabled="isGuestsInputOpen" type="text" placeholder="Para onde você vai?"
-              class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
-          </div>
+          <DestinationDate
+          :closeGuestsInput="closeGuestsInput"
+          :isGuestsInputOpen="isGuestsInputOpen"
+          :openGuestsInput="openGuestsInput"
+          v-model:destination="destination"/>
 
-          <div class="flex items-center gap-2">
-            <Calendar class="size-5 text-zinc-400" />
-            <input v-model="date" :disabled="isGuestsInputOpen" type="text" placeholder="Quando?"
-              class="bg-transparent text-lg placeholder-zinc-400 w-40 outline-none" />
-          </div>
-
-          <div class="w-px h-6 bg-zinc-800" />
-
-          <button v-if="isGuestsInputOpen" @click="closeGuestsInput"
-            class="bg-zinc-800 text-zinc-200 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-zinc-700">
-            Alterar local/data
-            <Settings2 class="size-5" />
-          </button>
-
-          <button v-else @click="openGuestsInput"
-            class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
-            Continuar
-            <ArrowRight class="size-5" />
-          </button>
-        </div>
-
-        <div v-if="isGuestsInputOpen" class="h-16 bg-zinc-900 px-4 rounded-xl flex items-center shadow-shape gap-3">
-          <button @click="openGuestsModal" class="flex items-center gap-2 flex-1 text-left">
-            <UserRoundPlus class="size-5 text-zinc-400" />
-            <span v-if="emailsToInvite.length > 0"
-              :class="{ 'text-zinc-500 text-lg flex-1': emailsToInvite.length > 0 }">
-              {{ emailsToInvite.length }} pessoa(s) convidada(s)
-            </span>
-            <span v-else :class="{ 'text-zinc-400 text-lg flex-1': !emailsToInvite.length }">
-              Quem estará na viagem?
-            </span>
-          </button>
-
-          <div class="w-px h-6 bg-zinc-800" />
-
-          <button @click="openConfirmTripModal"
-            class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
-            Confirmar viagem
-            <ArrowRight class="size-5" />
-          </button>
-        </div>
+        <InviteGuests
+        :isGuestsInputOpen="isGuestsInputOpen" 
+        :openGuestsModal="openGuestsModal"
+        :openConfirmTripModal="openConfirmTripModal"
+        :openGuestsInput="openGuestsInput"
+        :closeGuestsInput="closeGuestsInput"
+        v-model:emailsToInvite="emailsToInvite"/>
       </div>
 
       <p class="text-sm text-zinc-500">
@@ -80,17 +45,16 @@
 
     <ConfirmTripModalOpen
     :isConfirmTripModalOpen="isConfirmTripModalOpen"
-    @closeConfirmTripModal="closeConfirmTripModal"
-    />
-
+    @closeConfirmTripModal="closeConfirmTripModal"/>
   </div>
 </template>
 
 <script setup>
 import { defineProps } from 'vue';
-
 import InviteGuestsModal from "@/components/Modal/InviteGuestsModal.vue";
 import ConfirmTripModalOpen from "@/components/Modal/ConfirmTripModal.vue";
+import DestinationDate from '@/components/Input/DestinationDate.vue';
+import InviteGuests from '@/components/Input/InviteGuest.vue';
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
 
