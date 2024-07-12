@@ -13,7 +13,8 @@
           :closeGuestsInput="closeGuestsInput"
           :isGuestsInputOpen="isGuestsInputOpen"
           :openGuestsInput="openGuestsInput"
-          v-model:destination="destination"/>
+          v-model:destination="destination"
+          v-model:date="date"/>
 
         <InviteGuests
         :isGuestsInputOpen="isGuestsInputOpen" 

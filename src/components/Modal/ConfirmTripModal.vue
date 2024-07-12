@@ -29,18 +29,16 @@
               class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
           </div>
 
-          <button
-            class="bg-lime-300 w-full text-center text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center justify-center gap-2 hover:bg-lime-400"
-            type="submit">
+          <Button variant="primary">
             Confirmar criação da viagem
-
-          </button>
+          </Button>
         </form>
       </div>
-    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import {  User, X } from "lucide-vue-next";
+import Button from "@/components/Button/Button.vue";
 
 interface ConfirmTripModalProps {
   closeConfirmTripModal: () => void;
