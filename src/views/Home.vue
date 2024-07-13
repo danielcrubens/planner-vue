@@ -14,7 +14,10 @@
           :isGuestsInputOpen="isGuestsInputOpen"
           :openGuestsInput="openGuestsInput"
           v-model:destination="destination"
-          v-model:date="date"/>
+          v-model:date="date"
+          @update:localDestination="(value) => { destination.value = value; console.log('Destino atualizado:', value); }"
+
+          />
 
         <InviteGuests
         :isGuestsInputOpen="isGuestsInputOpen" 
@@ -45,8 +48,11 @@
 
 
     <ConfirmTripModalOpen
-    :isConfirmTripModalOpen="isConfirmTripModalOpen"
-    @closeConfirmTripModal="closeConfirmTripModal"/>
+    :ConfirmTripModalOpen="isConfirmTripModalOpen"
+    @closeConfirmTripModal="closeConfirmTripModal"
+    :createTrip="createTrip"
+    v-model:ownerName="ownerName"
+    v-model:ownerEmail="ownerEmail"/>
   </div>
 </template>
 
@@ -77,6 +83,8 @@ const isGuestsModalOpen = ref(false);
 const destination = ref("");
 const date = ref("");
 const newEmail = ref("");
+const ownerEmail = ref('');
+const ownerName = ref('');
 const emailsToInvite = ref(["daniel@rubens.com.br", "john@acme.com"]);
 const isConfirmTripModalOpen = ref(false);
 
@@ -100,22 +108,6 @@ const closeConfirmTripModal = () => {
 };
 const emailAlreadyAdded = ref(false);
 
-const addNewEmailToInvite = (event) => {
-  event.preventDefault();
-  if (!newEmail.value) return;
-
-  if (emailsToInvite.value.includes(newEmail.value)) {
-    emailAlreadyAdded.value = true;
-    setTimeout(() => {
-      emailAlreadyAdded.value = false;
-    }, 3000);
-    return;
-  }
-
-  emailsToInvite.value.push(newEmail.value);
-  newEmail.value = "";
-};
-
 const removeEmailFromInvites = (emailToRemove) => {
   emailsToInvite.value = emailsToInvite.value.filter(
     (email) => email !== emailToRemove
@@ -126,7 +118,12 @@ const router = useRouter();
 
 // Programmatic navigation
 const createTrip = () => {
-  router.push('/trips/123');
+  console.log('Convidados:', emailsToInvite.value);
+  console.log(' Name:', ownerName.value);
+  console.log(' Email:', ownerEmail.value);
+  console.log('Destino:', destination.value);
+  /* router.push('/trips/123'); */
 }
+
 
 </script>

@@ -21,13 +21,13 @@
         </div>
       </div>
       <div class="w-full h-px bg-zinc-800" />
-      <form @submit.prevent="addNewEmailToInvite" class="p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
+      <form @submit.prevent="addNewEmail" class="p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
         <div class="px-2 flex items-center flex-1 gap-2">
           <AtSign class="text-zinc-400 size-5" />
           <input v-model="newEmail" type="email" placeholder="Digite o e-mail do convidado"
             class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
         </div>
-        <button @click="addNewEmailToInvite" type="submit"
+        <button type="submit"
           class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
           Convidar
           <Plus class="size-5" />
@@ -56,26 +56,13 @@ interface InviteGuestsModalProps {
 
 const props = defineProps<InviteGuestsModalProps>();
 
-const newEmail = ref(props.newEmail);
-const addNewEmailToInvite = (event) => {
-  event.preventDefault();
-  if (!newEmail.value) return;
+const newEmail = ref("");
 
-  if (props.emailsToInvite.includes(newEmail.value)) {
-    emailAlreadyAdded.value = true;
-    setTimeout(() => {
-      emailAlreadyAdded.value = false;
-    }, 3000);
-    return;
+const addNewEmail = () => {
+  if (newEmail.value) {
+    console.log(newEmail.value);
+    props.emailsToInvite.push(newEmail.value);
+    newEmail.value = "";
   }
-
-  props.emailsToInvite.push(newEmail.value);
-  newEmail.value = "";
 };
-
-/* const removeEmailFromInvites = (emailToRemove) => {
-  props.emailsToInvite = props.emailsToInvite.filter(
-    (email) => email !== emailToRemove
-  );
-}; */
 </script>
