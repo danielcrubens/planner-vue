@@ -15,8 +15,6 @@
           :openGuestsInput="openGuestsInput"
           v-model:destination="destination"
           v-model:date="date"
-          @update:localDestination="(value) => { destination.value = value; console.log('Destino atualizado:', value); }"
-
           />
 
         <InviteGuests
@@ -64,6 +62,8 @@ import DestinationDate from '@/components/Input/DestinationDate.vue';
 import InviteGuests from '@/components/Input/InviteGuest.vue';
 import { ref } from "vue";
 import { useRouter } from 'vue-router';
+import { useTripStore } from '@/store/tripStore';
+
 
 import {
   ArrowRight,
@@ -82,10 +82,10 @@ const isGuestsInputOpen = ref(false);
 const isGuestsModalOpen = ref(false);
 const destination = ref("");
 const date = ref("");
-const newEmail = ref("");
+const newEmail = ref('');
 const ownerEmail = ref('');
 const ownerName = ref('');
-const emailsToInvite = ref(["daniel@rubens.com.br", "john@acme.com"]);
+const emailsToInvite = ref([]);
 const isConfirmTripModalOpen = ref(false);
 
 const openGuestsInput = () => {
@@ -115,15 +115,30 @@ const removeEmailFromInvites = (emailToRemove) => {
 };
 
 const router = useRouter();
-
-// Programmatic navigation
+const tripStore = useTripStore();
 const createTrip = () => {
   console.log('Convidados:', emailsToInvite.value);
-  console.log(' Name:', ownerName.value);
-  console.log(' Email:', ownerEmail.value);
+  console.log('Name:', ownerName.value);
+  console.log('Email:', ownerEmail.value);
   console.log('Destino:', destination.value);
-  /* router.push('/trips/123'); */
-}
+  tripStore.setOwnerName(ownerName.value);
+  tripStore.setOwnerEmail(ownerEmail.value)
+  tripStore.setEmailsToInvite(emailsToInvite.value)
 
 
+  router.push({ name: 'Trips' });
+
+  if (!destination.value) {
+    return;
+  }
+  if (!localDate?.from || !localDate?.to) {
+    return;
+  }
+  if (emailsToInvite.value.length === 0) {
+    return;
+  }
+  if (!ownerName.value || !ownerEmail.value) {
+    return;
+  }
+};
 </script>

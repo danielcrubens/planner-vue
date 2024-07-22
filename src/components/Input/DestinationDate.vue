@@ -30,6 +30,8 @@
 <script setup lang="ts">
 import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
 import { ref, watch } from 'vue';
+import { useTripStore } from '@/store/tripStore';
+
 
 
 interface DestinationDateProps {
@@ -43,10 +45,15 @@ interface DestinationDateProps {
 const props = defineProps<DestinationDateProps>();
 const localDestination = ref(props.destination);
 const localDate = ref(props.date);
+const tripStore = useTripStore();
+
 
 const handleContinue = () => {
   console.log('Destiono',localDestination.value);
   console.log('Data',localDate.value);
+  tripStore.setDestination(localDestination.value);
+  tripStore.setDate(localDate.value);
+
   props.openGuestsInput();
 };
 
