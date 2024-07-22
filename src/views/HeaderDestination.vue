@@ -32,9 +32,8 @@ const destination = computed(() => tripStore.destination);
 
 const formattedDate = computed(() => {
   const dateArray = tripStore.date;
-  if (dateArray && dateArray[0]) {
-    return format(new Date(dateArray[0]), 'dd/MM/yyyy');
-  }
-  return '';
+  const formattedStartDate = dateArray && dateArray[0] ? format(new Date(dateArray[0]), 'dd/MM/yyyy') : '';
+  const formattedEndDate = dateArray && dateArray[1] ? format(new Date(dateArray[1]), 'dd/MM/yyyy') : '';
+  return formattedEndDate ? `${formattedStartDate}, ${formattedEndDate}` : formattedStartDate;
 });
 </script>
