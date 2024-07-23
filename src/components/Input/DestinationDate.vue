@@ -8,10 +8,8 @@
 
     <div class="flex items-center gap-2">
       <Calendar class="size-5 text-zinc-400" />
-      <VueDatePicker v-model="localDate" :disabled="props.isGuestsInputOpen"@input="$emit('update:isGuestsInputOpen', $event.target.value)" class="picker"placeholder="Quando?"  range />
+      <VueDatePicker v-model="localDate" :disabled="props.isGuestsInputOpen"@input="$emit('update:isGuestsInputOpen', $event.target.value)" class="picker"placeholder="Quando?"  range :enable-time-picker="false" />
     </div>
-
-    <div class="" /><!-- w-px h-6 bg-zinc-800 -->
 
     <button v-if="props.isGuestsInputOpen" @click="closeGuestsInput"
       class="bg-zinc-800 text-zinc-200 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-zinc-700">
@@ -57,7 +55,6 @@ const handleContinue = () => {
   props.openGuestsInput();
 };
 
-// Watchers to sync local values with props
 watch(() => props.destination, (newValue) => {
   localDestination.value = newValue;
 });
@@ -80,32 +77,23 @@ watch(() => props.date, (newValue) => {
       --dp-hover-color: #484848;
       --dp-hover-text-color: #fff;
       --dp-hover-icon-color: #959595;
-      --dp-primary-color: #005cb2;
-      --dp-primary-disabled-color: #61a8ea;
-      --dp-primary-text-color: #fff;
-      --dp-secondary-color: #a9a9a9;
+      --dp-primary-color: #a3e635;
+      --dp-primary-text-color: #18181b;
       --dp-border-color: #2d2d2d;
       --dp-menu-border-color: #2d2d2d;
       --dp-border-color-hover: #aaaeb7;
       --dp-border-color-focus: #aaaeb7;
       --dp-disabled-color: #737373;
       --dp-disabled-color-text: #d0d0d0;
-      --dp-scroll-bar-background: #212121;
-      --dp-scroll-bar-color: #484848;
-      --dp-success-color: #00701a;
-      --dp-success-color-disabled: #428f59;
-      --dp-icon-color: #959595;
-      --dp-danger-color: #e53935;
-      --dp-marker-color: #e53935;
-      --dp-tooltip-color: #3e3e3e;
-      --dp-highlight-color: rgb(0 92 178 / 20%);
-      --dp-range-between-dates-background-color: var(--dp-hover-color, #484848);
-      --dp-range-between-dates-text-color: var(--dp-hover-text-color, #fff);
-      --dp-range-between-border-color: var(--dp-hover-color, #fff);
-      
-
   } 
-
+  .dp__action_buttons {
+    display: block;
+    flex: auto;
+    white-space: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    margin-inline-start: auto;
+}
   .dp__input_wrap{
     .dp__input{
     border: none!important;
@@ -115,12 +103,7 @@ watch(() => props.date, (newValue) => {
     font-size: 1.125rem;
     font-family: Inter, sans-serif;
     padding: 0;
-    color: red;
-    &::placeholder{
-      color: pink;
-    }
   }
-    width: 11rem;
     svg{
     display: none!important;
   } 
@@ -128,5 +111,4 @@ watch(() => props.date, (newValue) => {
     background: transparent;
   }
   } 
-
 </style>
