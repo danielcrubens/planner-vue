@@ -6,7 +6,7 @@ export const useTripStore = defineStore('trip', {
     ownerName: '',
     ownerEmail: '',
     destination: '',
-    date: '',
+    date: [] as string[],
   }),
   actions: {
     setOwnerName(name: string) {
@@ -21,7 +21,7 @@ export const useTripStore = defineStore('trip', {
     setDestination(destination: string) {
       this.destination = destination;
     },
-    setDate(date: string) {
+    setDate(date: string[]) {
       this.date = date;
     },
   }

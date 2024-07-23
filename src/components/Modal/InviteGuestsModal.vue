@@ -22,10 +22,17 @@
       </div>
       <div class="w-full h-px bg-zinc-800" />
       <form @submit.prevent="addNewEmail" class="p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
-        <div class="px-2 flex items-center flex-1 gap-2">
+        <div class="px-2 flex items-center flex-1 gap-2 relative">
           <AtSign class="text-zinc-400 size-5" />
-          <input v-model="newEmail" type="email" placeholder="Digite o e-mail do convidado"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
+          <input 
+            v-model="newEmail"  
+            placeholder="Digite o e-mail do convidado"
+            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" 
+            @input="clearValidationError"
+          />
+          <div v-if="validationError" class="text-red-500 px-2 text-xs absolute -bottom-4 ">
+            {{ validationError }}
+          </div>
         </div>
         <button type="submit"
           class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
@@ -35,9 +42,9 @@
       </form>
     </div>
   </div>
-  <div v-if="props.emailAlreadyAdded" class="fixed mx-auto top-5 inset-x-0 bg-red/60 max-w-sm w-full">
+  <div v-if="emailAlreadyAdded" class="fixed mx-auto top-5 inset-x-0 bg-red/60 max-w-sm w-full">
     <div role="alert" class="rounded-xl border-s-4 border-red-500 bg-red-50 p-4">
-      <strong class="block font-bold text-red-800 text-center">
+      <strong class="block font-bold text-red-500 text-center">
         Este e-mail já foi adicionado!
       </strong>
     </div>
@@ -47,6 +54,12 @@
 <script setup lang="ts">
 import { AtSign, Plus, X } from "lucide-vue-next";
 import { defineProps, ref } from 'vue';
+import { z } from 'zod';
+
+// Definindo o esquema de validação
+const validationSchema = z.object({
+  email: z.string().email({ message: "O e-mail fornecido não é válido" }),
+});
 
 interface InviteGuestsModalProps {
   isGuestsModalOpen: boolean;
@@ -57,12 +70,35 @@ interface InviteGuestsModalProps {
 const props = defineProps<InviteGuestsModalProps>();
 
 const newEmail = ref("");
+const emailAlreadyAdded = ref(false);
+const validationError = ref<string | null>(null);
 
-const addNewEmail = () => {
-  if (newEmail.value) {
-    console.log(newEmail.value);
-    props.emailsToInvite.push(newEmail.value);
-    newEmail.value = "";
+const addNewEmail = async () => {
+  const email = newEmail.value.trim();
+
+  // Validando o e-mail com o esquema do zod
+  const result = validationSchema.safeParse({ email });
+
+  if (!result.success) {
+    validationError.value = result.error.errors[0].message;
+    return;
   }
+
+  if (props.emailsToInvite.includes(email)) {
+    emailAlreadyAdded.value = true; 
+    setTimeout(() => {
+      emailAlreadyAdded.value = false;
+    }, 3000);
+  } else {
+    props.emailsToInvite.push(email);
+    newEmail.value = "";
+    emailAlreadyAdded.value = false;
+    validationError.value = null;
+  }
+};
+
+// Função para limpar o erro de validação
+const clearValidationError = () => {
+  validationError.value = null;
 };
 </script>

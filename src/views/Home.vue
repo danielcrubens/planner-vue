@@ -81,7 +81,7 @@ import {
 const isGuestsInputOpen = ref(false);
 const isGuestsModalOpen = ref(false);
 const destination = ref("");
-const date = ref("");
+const date = ref([]);
 const newEmail = ref('');
 const ownerEmail = ref('');
 const ownerName = ref('');
@@ -117,28 +117,9 @@ const removeEmailFromInvites = (emailToRemove) => {
 const router = useRouter();
 const tripStore = useTripStore();
 const createTrip = () => {
-  console.log('Convidados:', emailsToInvite.value);
-  console.log('Name:', ownerName.value);
-  console.log('Email:', ownerEmail.value);
-  console.log('Destino:', destination.value);
   tripStore.setOwnerName(ownerName.value);
   tripStore.setOwnerEmail(ownerEmail.value)
   tripStore.setEmailsToInvite(emailsToInvite.value)
-
-
   router.push({ name: 'Trips' });
-
-  if (!destination.value) {
-    return;
-  }
-  if (!localDate?.from || !localDate?.to) {
-    return;
-  }
-  if (emailsToInvite.value.length === 0) {
-    return;
-  }
-  if (!ownerName.value || !ownerEmail.value) {
-    return;
-  }
 };
 </script>
