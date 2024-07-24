@@ -7,6 +7,7 @@ export const useTripStore = defineStore('trip', {
     ownerEmail: '',
     destination: '',
     date: [] as string[],
+    activities: [] as { title: string; occurs_at: string }[],
   }),
   actions: {
     setOwnerName(name: string) {
@@ -23,6 +24,9 @@ export const useTripStore = defineStore('trip', {
     },
     setDate(date: string[]) {
       this.date = date;
+    },
+    addActivity(activity: { title: string; occurs_at: string }) {
+      this.activities.push(activity);
     },
   }
 });
