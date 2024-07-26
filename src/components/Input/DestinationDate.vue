@@ -10,25 +10,20 @@
         placeholder="Para onde você vai?"
         class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
       />
+      <div v-if="errorMessageDestination" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDestination }}</div>
     </div>
-    <div v-if="errors.destination" class="text-red-500 px-2 text-xs absolute -bottom-0 ">
-      {{ errors.destination }}
-    </div>
-
     <div class="flex items-center gap-2">
       <Calendar class="size-5 text-zinc-400" />
       <VueDatePicker
         v-model="localDate"
         :disabled="props.isGuestsInputOpen"
-        @input="handleDateInput"
+        @update:model-value="handleDateInput"
         class="picker"
         placeholder="Quando?"
         range
         :enable-time-picker="false"
       />
-    </div>
-    <div v-if="errors.date" class="text-red-500 px-2 text-xs absolute -bottom-0 right-0">
-      {{ errors.date }}
+      <div v-if="errorMessageDate" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDate }}</div>
     </div>
 
     <button
@@ -40,8 +35,7 @@
       <Settings2 class="size-5" />
     </button>
 
-    <button
-      v-else
+    <button v-else
       @click="handleContinue"
       class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
     >
@@ -57,11 +51,6 @@ import { ref, watch } from 'vue';
 import { useTripStore } from '@/store/tripStore';
 import { z } from 'zod';
 
-const validationSchema = z.object({
-  destination: z.string().min(1, { message: "O destino é obrigatório" }),
-  /* date: z.array(z.string()).min(1, { message: "A data é obrigatória" }) */
-});
-
 interface DestinationDateProps {
   isGuestsInputOpen: boolean;
   closeGuestsInput: () => void;
@@ -69,43 +58,47 @@ interface DestinationDateProps {
   date: string[];
   destination: string;
 }
+
 const props = defineProps<DestinationDateProps>();
 const localDestination = ref(props.destination);
 const localDate = ref(props.date);
 const tripStore = useTripStore();
-const errors = ref<{ destination?: string; date?: string }>({});
+const errorMessageDestination = ref('');
+const errorMessageDate = ref('');
 
-const handleContinue = async () => {
-  errors.value = {};
+const destinationSchema = z.string().min(1, { message: "O destino é obrigatório" });
+const dateSchema = z.string().nonempty('A data é obrigatória');
+
+const handleContinue = () => {
+  errorMessageDestination.value = '';
+  errorMessageDate.value = '';
   try {
-    validationSchema.parse({
-      destination: localDestination.value,
-      date: localDate.value
-    });
+    destinationSchema.parse(localDestination.value);
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      errorMessageDestination.value = e.errors.map(err => err.message).join(', ');
+    }
+  }
+  try {
+    dateSchema.parse(localDate.value ? localDate.value.toString() : '');
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      errorMessageDate.value = e.errors.map(err => err.message).join(', ');
+    }
+  }
+  if (!errorMessageDestination.value && !errorMessageDate.value) {
     tripStore.setDestination(localDestination.value);
     tripStore.setDate(localDate.value);
     props.openGuestsInput();
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      error.errors.forEach(err => {
-        errors.value[err.path[0]] = err.message;
-      });
-    }
   }
 };
 
-const handleDestinationInput = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (errors.value.destination) {
-    errors.value.destination = '';
-  }
+const handleDestinationInput = () => {
+  errorMessageDestination.value = '';
 };
 
-const handleDateInput = (value: string[]) => {
-  if (errors.value.date) {
-    errors.value.date = '';
-  }
-  localDate.value = value;
+const handleDateInput = () => {
+  errorMessageDate.value = '';
 };
 
 watch(() => props.destination, (newValue) => {

@@ -13,7 +13,7 @@
 
           <div class="w-px h-6 bg-zinc-800" />
 
-          <button @click="openConfirmTripModal"
+          <button @click="openConfirmTripModal" :disabled="!isFormValid" :class="{'cursor-not-allowed': !isFormValid ,'opacity-60': !isFormValid}"
             class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
             Confirmar viagem
             <ArrowRight class="size-5" />
@@ -22,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
   import { ArrowRight, UserRoundPlus } from "lucide-vue-next";
   interface InviteGuestProps {
     isGuestsInputOpen: boolean;
@@ -30,6 +31,8 @@
     emailsToInvite: string[];
   }
   const props = defineProps<InviteGuestProps>();
-
+const isFormValid = computed(() => {
+  return props.emailsToInvite.length > 0;
+})
 </script>
 

@@ -2,7 +2,6 @@
   <div class="space-y-8">
     <div v-for="activity in activities" :key="activity.title" class="space-y-2.5">
       <div class="flex gap-2 items-baseline">
-        <!-- <span class="text-xl text-zinc-300 font-semibold">{{ activity.title }}</span> -->
       </div>
       <div class="space-y-2.5">
         <div class="px-4 py-2.5 bg-zinc-900 rounded-xl shadow-shape flex items-center gap-3">

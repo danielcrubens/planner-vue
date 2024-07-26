@@ -12,23 +12,32 @@
           Todos convidados podem visualizar as atividades.
         </p>
       </div>
-      <form @submit.prevent="createActivity" class="space-y-3">
-        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
+      <form @submit.prevent="handleSubmit" class="space-y-3">
+        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
           <Tag class="text-zinc-400 size-5" />
-          <input type="text" v-model="formData.title" name="title" placeholder="Qual a atividade?"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
+          <input 
+            type="text" 
+            v-model="formData.title" 
+            name="title" 
+            placeholder="Qual a atividade?"
+            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
+            @input="clearTitleError"
+          />
+          <div v-if="errorMessageTitle" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTitle }}</div>
         </div>
-        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
+        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
           <Calendar class="text-zinc-400 size-5" />
           <VueDatePicker
             v-model="formData.occurs_at"
-            class="picker"
+            id="dcr" 
             placeholder="Horário da atividade"
             :is24="true"
             time-picker
-            
             format="HH:mm"
+            @update:model-value="clearTimeError"
+            
           />
+          <div v-if="errorMessageTime" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTime }}</div>
         </div>
         <Button type="submit" variant="primary" size="full">
           Salvar atividade
@@ -44,6 +53,12 @@ import Button from "@/components/Button/Button.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { ref } from "vue";
+import { z } from 'zod';
+
+const errorMessageTitle = ref('');
+const errorMessageTime = ref('');
+const props = defineProps<CreateActivityProps>();
+const formData = ref({ title: '', occurs_at: '' });
 
 interface CreateActivityProps {
   closeCreateActivityModal: () => void;
@@ -51,22 +66,48 @@ interface CreateActivityProps {
   submitActivity: (formData: { title: string; occurs_at: string }) => void;
 }
 
-const props = defineProps<CreateActivityProps>();
-const formData = ref({ title: '', occurs_at: '' });
+const titleSchema = z.string().min(1, { message: "O nome da atividade é obrigatório" });
+const timeSchema = z.string().nonempty('A data é obrigatória');
 
-const createActivity = () => {
-  props.submitActivity(formData.value);
-  console.log("Form data submitted:", formData.value);
-  formData.value = { title: '', occurs_at: { hours: 0, minutes: 0 } }; 
+const handleSubmit = () => {
+  errorMessageTitle.value = '';
+  errorMessageTime.value = '';
+  try {
+    titleSchema.parse(formData.value.title);
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      errorMessageTitle.value = e.errors.map(err => err.message).join(', ');
+    }
+  }
+  try {
+    timeSchema.parse(formData.value.occurs_at ? formData.value.occurs_at.toString() : '');
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      errorMessageTime.value = e.errors.map(err => err.message).join(', ');
+    }
+  }
+  if (!errorMessageTitle.value && !errorMessageTime.value) {
+    props.submitActivity(formData.value);
+    formData.value = { title: '', occurs_at: '' };
+  }
+};
+
+const clearTitleError = () => {
+  errorMessageTitle.value = '';
+};
+
+const clearTimeError = () => {
+  errorMessageTime.value = '';
 };
 </script>
 
-<style  scss>
-.picker {
-  &::placeholder {
-    color: #fff;
-  }
+<style   scss>
+.dp__input_wrap input::placeholder {
+  color: #e4e0e0!important;
+  font-weight: 300;
 }
+
+
 .dp__theme_light {
   outline: none;
   --dp-background-color: #18181b;
@@ -82,6 +123,7 @@ const createActivity = () => {
   --dp-disabled-color: #737373;
   --dp-disabled-color-text: #d0d0d0;
 }
+
 .dp__action_buttons {
   display: block;
   flex: auto;
@@ -90,21 +132,28 @@ const createActivity = () => {
   justify-content: flex-end;
   margin-inline-start: auto;
 }
+
 .dp__input_wrap {
   .dp__input {
     border: none !important;
   }
+
   input {
     font-size: 1.125rem;
     font-family: Inter, sans-serif;
     padding: 0;
     background: transparent;
   }
+
   svg {
     display: none !important;
   }
+
   .dp__disabled {
     background: transparent;
   }
+
+  /* Adicione esta regra para mudar a cor do placeholder */
+
 }
 </style>
