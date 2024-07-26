@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
+  <div class="md:px-4 px-1 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
     <div class="flex items-center gap-2">
       <MapPin class="size-5 text-zinc-400" />
       <span class="text-zinc-100"> {{ destination }} </span>

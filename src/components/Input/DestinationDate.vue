@@ -1,6 +1,6 @@
 <template>
-  <div class="h-16 bg-zinc-900 px-4 rounded-xl flex items-center gap-3 relative">
-    <div class="flex items-center gap-2 flex-1">
+  <div class="md:h-16  md:bg-zinc-900 md:px-4 rounded-xl grid grid-cols-1 gap-4 md:flex md:items-center md:gap-3 relative">
+    <div class="flex items-center gap-2 bg-zinc-900   flex-1  py-3 px-2  rounded-lg relative">
       <MapPin class="size-5 text-zinc-400" />
       <input
         v-model="localDestination"
@@ -8,11 +8,11 @@
         @input="handleDestinationInput"
         type="text"
         placeholder="Para onde você vai?"
-        class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
+        class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
       />
       <div v-if="errorMessageDestination" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDestination }}</div>
     </div>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 bg-zinc-900 py-3 px-2  rounded-lg relative">
       <Calendar class="size-5 text-zinc-400" />
       <VueDatePicker
         v-model="localDate"
@@ -111,10 +111,9 @@ watch(() => props.date, (newValue) => {
 </script>
 
 <style  scss>
-.picker {
-  &::placeholder {
-    color: #fff;
-  }
+.dp__input_wrap input::placeholder {
+  color: #e4e0e0!important;
+  font-weight: 300;
 }
 .dp__theme_light {
   outline: none;
@@ -147,6 +146,9 @@ watch(() => props.date, (newValue) => {
     font-size: 1.125rem;
     font-family: Inter, sans-serif;
     padding: 0;
+    @media screen and (max-width: 640px) {
+      font-size: 1rem;
+    }
   }
   svg {
     display: none !important;

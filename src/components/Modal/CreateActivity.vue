@@ -1,6 +1,6 @@
 <template>
   <div v-if="props.isCreateActivityModalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center">
-    <div class="w-[640px] rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
+    <div class="md:w-[640px] w-11/12 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">Cadastrar atividade</h2>
@@ -20,7 +20,7 @@
             v-model="formData.title" 
             name="title" 
             placeholder="Qual a atividade?"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1"
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
             @input="clearTitleError"
           />
           <div v-if="errorMessageTitle" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTitle }}</div>
@@ -143,6 +143,9 @@ const clearTimeError = () => {
     font-family: Inter, sans-serif;
     padding: 0;
     background: transparent;
+    @media screen and (max-width: 640px) {
+      font-size: 1rem;
+    }
   }
 
   svg {
@@ -152,8 +155,5 @@ const clearTimeError = () => {
   .dp__disabled {
     background: transparent;
   }
-
-  /* Adicione esta regra para mudar a cor do placeholder */
-
 }
 </style>

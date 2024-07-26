@@ -20,13 +20,13 @@
         <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
           <User class="text-zinc-400 size-5" />
           <input type="text" v-model="props.ownerName" @input="$emit('update:ownerName', $event.target.value)" name="name" placeholder="Seu nome completo"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1" />
         </div>
         <div class="text-red-500 text-xs" v-if="errors.name">{{ errors.name }}</div>
         <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
           <Mail class="text-zinc-400 size-5" />
           <input type="email" v-model="props.ownerEmail" @input="$emit('update:ownerEmail', $event.target.value)" name="email" placeholder="Seu e-mail pessoal"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" />
+            class="bg-transparent md:ext-lg placeholder-zinc-400 outline-none flex-1" />
         </div>
         <div class="text-red-500 text-xs" v-if="errors.email">{{ errors.email }}</div>
         <Button type="submit" variant="primary">

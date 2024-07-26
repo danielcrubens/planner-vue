@@ -27,7 +27,7 @@
           <input 
             v-model="newEmail"  
             placeholder="Digite o e-mail do convidado"
-            class="bg-transparent text-lg placeholder-zinc-400 outline-none flex-1" 
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1" 
             @input="clearValidationError"
           />
           <div v-if="validationError" class="text-red-500 px-2 text-xs absolute -bottom-4 ">
@@ -56,7 +56,6 @@ import { AtSign, Plus, X } from "lucide-vue-next";
 import { defineProps, ref } from 'vue';
 import { z } from 'zod';
 
-// Definindo o esquema de validação
 const validationSchema = z.object({
   email: z.string().email({ message: "O e-mail fornecido não é válido" }),
 });
@@ -76,7 +75,6 @@ const validationError = ref<string | null>(null);
 const addNewEmail = async () => {
   const email = newEmail.value.trim();
 
-  // Validando o e-mail com o esquema do zod
   const result = validationSchema.safeParse({ email });
 
   if (!result.success) {
@@ -97,7 +95,6 @@ const addNewEmail = async () => {
   }
 };
 
-// Função para limpar o erro de validação
 const clearValidationError = () => {
   validationError.value = null;
 };

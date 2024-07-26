@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6 mt-7 md:mt-0  hidden md:block">
       <h2 class="font-semibold text-xl">Links importantes</h2>
 
       <div class="space-y-5">

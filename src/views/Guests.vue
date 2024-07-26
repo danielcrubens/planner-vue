@@ -21,8 +21,8 @@
       <h2 class="font-semibold text-xl">Convidados</h2>
 
       <div class="space-y-5">
-        <div class="flex items-center justify-between gap-4">
-          <div class="flex flex-wrap gap-2">
+        <div class="md:flex grid md:items-center justify-between gap-4">
+          <div class="md:flex md:flex-wrap gap-2">
               <span class="block text-sm text-zinc-400 truncate">{{ emailsToInvite.join(', ') }}</span>
           </div>
 
