@@ -48,7 +48,7 @@ import { User, X, Mail } from "lucide-vue-next";
 import Button from "@/components/Button/Button.vue";
 import { z } from 'zod';
 import { ref, computed } from 'vue';
-import { useTripStore } from '@/store/tripStore'; 
+import {  useTripStore } from '../../store/tripStore'; 
 import { format } from 'date-fns';
 
 const tripStore = useTripStore();

@@ -48,7 +48,7 @@
 <script setup lang="ts">
 import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
 import { ref, watch } from 'vue';
-import { useTripStore } from '@/store/tripStore';
+import { useTripStore } from '../../store/tripStore';
 import { z } from 'zod';
 
 interface DestinationDateProps {
