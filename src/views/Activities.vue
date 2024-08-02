@@ -4,6 +4,10 @@
       <div class="flex gap-2 items-baseline">
       </div>
       <div class="space-y-2.5">
+        <div class="space-x-2.5">
+          <span class="text-zinc-100 text-lg font-bold">Dia {{ getDayNumber(activity.date) }}</span>
+          <span class="text-zinc-400 text-sm">{{ getDayName(activity.date) }}</span>
+        </div>
         <div class="px-4 py-2.5 bg-zinc-900 rounded-xl shadow-shape flex items-center gap-3">
           <CircleCheck class="size-5 text-lime-300" />
           <span class="text-zinc-100">{{ activity.title }}</span>
@@ -19,6 +23,7 @@ import { CircleCheck } from "lucide-vue-next";
 import { defineProps } from "vue";
 import { ActivityListProps } from '../types/Activity';
 import { formatTime } from '../utils/timeUtils';
+import { getDayName, getDayNumber } from '../utils/dateUtils';
 
 const props = defineProps<ActivityListProps>();
 </script>

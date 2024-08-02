@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">Cadastrar atividade</h2>
           <button>
-            <X class="size-5 text-zinc-400" @click="$emit('closeCreateActivityModal')"/>
+            <X class="size-5 text-zinc-400" @click="$emit('closeCreateActivityModal')" />
           </button>
         </div>
         <p class="text-sm text-zinc-400">
@@ -15,29 +15,26 @@
       <form @submit.prevent="handleSubmit" class="space-y-3">
         <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
           <Tag class="text-zinc-400 size-5" />
-          <input 
-            type="text" 
-            v-model="formData.title" 
-            name="title" 
-            placeholder="Qual a atividade?"
-            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
-            @input="clearTitleError"
-          />
-          <div v-if="errorMessageTitle" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTitle }}</div>
+          <input type="text" v-model="formData.title" name="title" placeholder="Qual a atividade?"
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1" @input="clearTitleError" />
+          <div v-if="errorMessageTitle" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTitle }}
+          </div>
         </div>
-        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
-          <Calendar class="text-zinc-400 size-5" />
-          <VueDatePicker
-            v-model="formData.occurs_at"
-            id="dcr" 
-            placeholder="Horário da atividade"
-            :is24="true"
-            time-picker
-            format="HH:mm"
-            @update:model-value="clearTimeError"
-            
-          />
-          <div v-if="errorMessageTime" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTime }}</div>
+        <div class="w-2/2 lg:flex gap-9 space-y-3 lg:space-y-0">
+          <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
+            <Clock3 class="text-zinc-400 size-5" />
+            <VueDatePicker v-model="formData.occurs_at" id="dcr" placeholder="Horário da atividade" :is24="true"
+              time-picker format="HH:mm" @update:model-value="clearTimeError" />
+            <div v-if="errorMessageTime" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageTime }}
+            </div>
+          </div>
+          <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
+            <Calendar class="text-zinc-400 size-5" />
+            <VueDatePicker v-model="formData.date" placeholder="Data" :format="dateFormat" :format-locale="formatLocale"
+              :week-days="weekDays" auto-apply hide-time-header @update:model-value="clearDateError" />
+            <div v-if="errorMessageDate" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDate }}
+            </div>
+          </div>
         </div>
         <Button type="submit" variant="primary" size="full">
           Salvar atividade
@@ -48,24 +45,24 @@
 </template>
 
 <script setup lang="ts">
-import { Tag, X, Calendar } from "lucide-vue-next";
+import { Tag, X, Calendar, Clock3 } from "lucide-vue-next";
 import Button from "@/components/Button/Button.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { ref } from "vue";
 import { z } from 'zod';
+import { ptBR } from 'date-fns/locale';
 import { CreateActivityProps } from '../../types/CreateActivity';
-
 
 const errorMessageTitle = ref('');
 const errorMessageTime = ref('');
+const errorMessageDate = ref('');
 const props = defineProps<CreateActivityProps>();
-const formData = ref({ title: '', occurs_at: '' });
-
-
+const formData = ref({ title: '', occurs_at: '', date: '' });
 
 const titleSchema = z.string().min(1, { message: "O nome da atividade é obrigatório" });
-const timeSchema = z.string().nonempty('A data é obrigatória');
+const timeSchema = z.string().nonempty('A hora é obrigatória');
+const dateSchema = z.string().nonempty('A data é obrigatória');
 
 const handleSubmit = () => {
   errorMessageTitle.value = '';
@@ -84,9 +81,16 @@ const handleSubmit = () => {
       errorMessageTime.value = e.errors.map(err => err.message).join(', ');
     }
   }
-  if (!errorMessageTitle.value && !errorMessageTime.value) {
+  try {
+    dateSchema.parse(formData.value.date ? formData.value.date.toString() : '');
+  } catch (e) {
+    if (e instanceof z.ZodError) {
+      errorMessageDate.value = e.errors.map(err => err.message).join(', ');
+    }
+  }
+  if (!errorMessageTitle.value && !errorMessageTime.value && !errorMessageDate.value) {
     props.submitActivity(formData.value);
-    formData.value = { title: '', occurs_at: '' };
+    formData.value = { title: '', occurs_at: '', date: '' };
   }
 };
 
@@ -97,15 +101,24 @@ const clearTitleError = () => {
 const clearTimeError = () => {
   errorMessageTime.value = '';
 };
+const clearDateError = () => {
+  errorMessageDate.value = '';
+};
+
+const dateFormat = 'dd MMMM, EEEE';
+const formatLocale = ptBR;
+const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 </script>
 
-<style   scss>
+<style scss>
 .dp__input_wrap input::placeholder {
-  color: #e4e0e0!important;
+  color: #e4e0e0 !important;
   font-weight: 300;
 }
+.dp__btn.dp__button.dp__button_bottom {
+  visibility: hidden;
 
-
+}
 .dp__theme_light {
   outline: none;
   --dp-background-color: #18181b;
@@ -141,6 +154,7 @@ const clearTimeError = () => {
     font-family: Inter, sans-serif;
     padding: 0;
     background: transparent;
+
     @media screen and (max-width: 640px) {
       font-size: 1rem;
     }
