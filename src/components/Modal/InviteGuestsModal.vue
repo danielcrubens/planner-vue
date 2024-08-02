@@ -55,16 +55,12 @@
 import { AtSign, Plus, X } from "lucide-vue-next";
 import { defineProps, ref } from 'vue';
 import { z } from 'zod';
+import { InviteGuestsModalProps } from '../../types/InviteGuestsModal';
 
 const validationSchema = z.object({
   email: z.string().email({ message: "O e-mail fornecido não é válido" }),
 });
 
-interface InviteGuestsModalProps {
-  isGuestsModalOpen: boolean;
-  emailsToInvite: string[];
-  emailAlreadyAdded: boolean;
-}
 
 const props = defineProps<InviteGuestsModalProps>();
 

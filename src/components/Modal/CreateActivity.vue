@@ -54,17 +54,15 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import { ref } from "vue";
 import { z } from 'zod';
+import { CreateActivityProps } from '../../types/CreateActivity';
+
 
 const errorMessageTitle = ref('');
 const errorMessageTime = ref('');
 const props = defineProps<CreateActivityProps>();
 const formData = ref({ title: '', occurs_at: '' });
 
-interface CreateActivityProps {
-  closeCreateActivityModal: () => void;
-  isCreateActivityModalOpen: boolean;
-  submitActivity: (formData: { title: string; occurs_at: string }) => void;
-}
+
 
 const titleSchema = z.string().min(1, { message: "O nome da atividade é obrigatório" });
 const timeSchema = z.string().nonempty('A data é obrigatória');

@@ -17,17 +17,8 @@
 <script setup lang="ts">
 import { CircleCheck } from "lucide-vue-next";
 import { defineProps } from "vue";
+import { ActivityListProps } from '../types/Activity';
+import { formatTime } from '../utils/timeUtils';
 
-interface Activity {
-  title: string;
-  occurs_at: { hours: number; minutes: number; seconds: number };
-}
-
-const props = defineProps<{ activities: Activity[] }>();
-
-const formatTime = (time: { hours: number; minutes: number }) => {
-  const hours = time.hours.toString().padStart(2, '0');
-  const minutes = time.minutes.toString().padStart(2, '0');
-  return `${hours}:${minutes}`;
-};
+const props = defineProps<ActivityListProps>();
 </script>

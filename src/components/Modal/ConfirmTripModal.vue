@@ -50,6 +50,8 @@ import { z } from 'zod';
 import { ref, computed } from 'vue';
 import {  useTripStore } from '../../store/tripStore'; 
 import { format } from 'date-fns';
+import { ConfirmTripModalProps } from '../../types/ConfirmTripModal';
+
 
 const tripStore = useTripStore();
 
@@ -62,13 +64,6 @@ const formattedDate = computed(() => {
   return formattedEndDate ? `${formattedStartDate} a ${formattedEndDate}` : formattedStartDate;
 });
 
-interface ConfirmTripModalProps {
-  closeConfirmTripModal: () => void;
-  createTrip: () => void;
-  ConfirmTripModalOpen: boolean;
-  ownerName: string;
-  ownerEmail: string;
-}
 const props = defineProps<ConfirmTripModalProps>();
 
 const errors = ref<{ name?: string; email?: string }>({});
