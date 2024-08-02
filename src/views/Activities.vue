@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-8">
-    <div v-for="activity in activities" :key="activity.title" class="space-y-2.5">
+    <div v-for="activity in props.activities" :key="activity.title" class="space-y-2.5">
       <div class="flex gap-2 items-baseline">
       </div>
       <div class="space-y-2.5">

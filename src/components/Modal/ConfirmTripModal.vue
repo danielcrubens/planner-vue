@@ -19,13 +19,19 @@
       <form @submit.prevent="createTrip" class="space-y-3">
         <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
           <User class="text-zinc-400 size-5" />
-          <input type="text" v-model="props.ownerName" @input="$emit('update:ownerName', $event.target.value)" name="name" placeholder="Seu nome completo"
+          <input type="text" v-model="props.ownerName"
+          @input="$emit('update:ownerName', ($event.target as HTMLInputElement)?.value ?? '')"
+          name="name"
+            placeholder="Seu nome completo"
             class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1" />
         </div>
         <div class="text-red-500 text-xs" v-if="errors.name">{{ errors.name }}</div>
         <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
           <Mail class="text-zinc-400 size-5" />
-          <input type="email" v-model="props.ownerEmail" @input="$emit('update:ownerEmail', $event.target.value)" name="email" placeholder="Seu e-mail pessoal"
+          <input type="email" v-model="props.ownerEmail"
+          @input="$emit('update:ownerEmail', ($event.target as HTMLInputElement)?.value ?? '')"
+          name="email"
+            placeholder="Seu e-mail pessoal"
             class="bg-transparent md:ext-lg placeholder-zinc-400 outline-none flex-1" />
         </div>
         <div class="text-red-500 text-xs" v-if="errors.email">{{ errors.email }}</div>
@@ -42,8 +48,8 @@ import { User, X, Mail } from "lucide-vue-next";
 import Button from "@/components/Button/Button.vue";
 import { z } from 'zod';
 import { ref, computed } from 'vue';
-import { useTripStore } from '@/store/tripStore';
-import { format } from 'date-fns';  
+import { useTripStore } from '@/store/tripStore'; 
+import { format } from 'date-fns';
 
 const tripStore = useTripStore();
 
@@ -81,7 +87,7 @@ const createTrip = () => {
   if (!result.success) {
     errors.value = {};
     result.error.errors.forEach((err) => {
-      errors.value[err.path[0]] = err.message;
+      errors.value[err.path[0] as keyof typeof errors.value] = err.message;
     });
     return;
   }
