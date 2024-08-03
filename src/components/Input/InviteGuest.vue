@@ -11,10 +11,10 @@
             </span>
           </button>
 
-          <div class="w-px h-6 bg-zinc-800" />
+          <div class="lg:w-px h-6 bg-zinc-800 hidden lg:block" />
 
           <button @click="openConfirmTripModal" :disabled="!isFormValid" :class="{'cursor-not-allowed': !isFormValid ,'opacity-60': !isFormValid}"
-            class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
+            class="bg-lime-300 text-lime-950 rounded-lg lg:px-5 px-2 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
             Confirmar viagem
             <ArrowRight class="size-5" />
           </button>
@@ -24,12 +24,8 @@
 <script setup lang="ts">
 import { computed } from "vue";
   import { ArrowRight, UserRoundPlus } from "lucide-vue-next";
-  interface InviteGuestProps {
-    isGuestsInputOpen: boolean;
-    openGuestsModal: () => void;
-    openConfirmTripModal: () => void;
-    emailsToInvite: string[];
-  }
+  import {InviteGuestProps} from '../../types/InviteGuest';
+
   const props = defineProps<InviteGuestProps>();
 const isFormValid = computed(() => {
   return props.emailsToInvite.length > 0;

@@ -50,14 +50,8 @@ import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
 import { ref, watch } from 'vue';
 import { useTripStore } from '../../store/tripStore';
 import { z } from 'zod';
+import { DestinationDateProps } from '../../types/DestinationDate';
 
-interface DestinationDateProps {
-  isGuestsInputOpen: boolean;
-  closeGuestsInput: () => void;
-  openGuestsInput: () => void;
-  date: string[];
-  destination: string;
-}
 
 const props = defineProps<DestinationDateProps>();
 const localDestination = ref(props.destination);

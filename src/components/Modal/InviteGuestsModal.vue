@@ -1,6 +1,6 @@
 <template>
   <div v-if="props.isGuestsModalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center">
-    <div class="w-[640px] rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
+    <div class="w-[640px] rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5 h-[50vh]">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">Selecionar convidados</h2>
@@ -21,8 +21,8 @@
         </div>
       </div>
       <div class="w-full h-px bg-zinc-800" />
-      <form @submit.prevent="addNewEmail" class="p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2">
-        <div class="px-2 flex items-center flex-1 gap-2 relative">
+      <form @submit.prevent="addNewEmail" class="p-2.5 lg:bg-zinc-950 border border-zinc-800 rounded-lg flex flex-col md:flex-row md:items-center gap-2">
+        <div class="lg:px-2 lg:py-0 py-2.5 px-2.5  flex items-center flex-1 border lg:border-0 border-zinc-800 rounded-lg gap-y-7 gap-x-2 relative bg-zinc-950">
           <AtSign class="text-zinc-400 size-5" />
           <input 
             v-model="newEmail"  
@@ -35,7 +35,7 @@
           </div>
         </div>
         <button type="submit"
-          class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
+          class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 mt-4 lg:mt-0 font-medium flex items-center gap-2 hover:bg-lime-400">
           Convidar
           <Plus class="size-5" />
         </button>
@@ -50,6 +50,7 @@
     </div>
   </div>
 </template>
+
 
 <script setup lang="ts">
 import { AtSign, Plus, X } from "lucide-vue-next";
