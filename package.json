@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cypress:run": "cypress run --config video=false --component"
+
   },
   "dependencies": {
     "@vee-validate/zod": "^4.13.2",
@@ -23,6 +25,7 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.5",
     "autoprefixer": "^10.4.19",
+    "cypress": "^13.13.2",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.4",
