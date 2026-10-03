@@ -18,6 +18,10 @@
         <p class="text-zinc-400 text-sm">{{ formatDateRange(invite.trip) }}</p>
         <p class="text-zinc-500 text-xs">Convite enviado para {{ invite.email }}</p>
 
+        <p class="text-zinc-400 text-sm">
+          Entre com a conta Google deste e-mail para <span class="text-zinc-200 font-medium">confirmar sua presença</span> e ver a viagem.
+        </p>
+
         <p v-if="acceptError" class="text-red-500 text-xs">{{ acceptError }}</p>
 
         <Button variant="primary" size="full" :disabled="isAccepting" @click="accept">
@@ -66,6 +70,10 @@ const formatDateRange = (trip: InvitePreview['trip']) => {
 };
 
 onMounted(async () => {
+  // aba nova tem auth.user vazio na memória, mas pode haver sessão válida
+  // no cookie — restaura antes de decidir se o modal de login é preciso.
+  await auth.ensureAuth().catch(() => false);
+
   try {
     const { data } = await api.get<InvitePreview>(`/invites/${token}`);
     invite.value = data;

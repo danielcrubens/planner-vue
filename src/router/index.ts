@@ -20,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { public: true },
   },
   {
+    path: '/auth/magic/:token',
+    name: 'MagicLink',
+    component: () => import('../views/MagicLinkView.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/invite/:token',
     name: 'Invite',
     component: () => import('../views/InviteView.vue'),

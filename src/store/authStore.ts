@@ -39,6 +39,12 @@ export const useAuthStore = defineStore('auth', {
       this.user = data;
     },
 
+    async verifyMagicLink(token: string): Promise<string | null> {
+      const { data } = await api.post(`/auth/magic-link/${token}/verify`);
+      this.setSession(data.user, data.accessToken);
+      return data.redirect ?? null;
+    },
+
     async refresh() {
       const { data } = await api.post('/auth/refresh');
       this.accessToken = data.accessToken;

@@ -8,10 +8,6 @@
         </button>
       </div>
 
-      <p class="text-sm text-zinc-400">
-        Faça login com sua conta Google para convidar amigos e planejar sua viagem.
-      </p>
-
       <button
         type="button"
         class="w-full h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center gap-3 text-zinc-100 font-medium hover:bg-zinc-800 transition-colors"
@@ -25,18 +21,88 @@
         </svg>
         Entrar com Google
       </button>
+
+      <div class="flex items-center gap-3 text-zinc-500 text-xs">
+        <div class="h-px flex-1 bg-zinc-800" />
+        ou
+        <div class="h-px flex-1 bg-zinc-800" />
+      </div>
+
+      <form v-if="!linkSent" @submit.prevent="sendMagicLink" class="space-y-3">
+        <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
+          <Mail class="text-zinc-400 size-5" />
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Seu e-mail (qualquer provedor)"
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
+            @input="errorMessage = ''"
+          />
+        </div>
+
+        <p v-if="errorMessage" class="text-red-500 text-xs">{{ errorMessage }}</p>
+
+        <Button type="submit" variant="primary" size="full" :disabled="isSending">
+          {{ isSending ? 'Enviando...' : 'Enviar acesso' }}
+        </Button>
+      </form>
+
+      <div v-else class="rounded-lg bg-zinc-950 border border-zinc-800 p-4 text-center space-y-1">
+        <p class="text-lime-300 text-sm font-medium">Link enviado! ✉️</p>
+        <p class="text-zinc-400 text-xs">
+          Enviamos um link de acesso para <span class="text-zinc-200">{{ email }}</span>.
+          Ele é válido por 15 minutos.
+        </p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { X } from 'lucide-vue-next';
-import { API_BASE_URL } from '@/services/api/axios';
+import { ref } from 'vue';
+import { useRoute } from 'vue-router';
+import { Mail, X } from 'lucide-vue-next';
+import { z } from 'zod';
+import Button from '@/components/Button/Button.vue';
+import { api, API_BASE_URL } from '@/services/api/axios';
+import { errorMessage as toMessage } from '@/store/tripStore';
 
 const props = defineProps<{ isOpen: boolean }>();
 defineEmits<{ (e: 'closer'): void }>();
 
+const route = useRoute();
+const email = ref('');
+const isSending = ref(false);
+const errorMessage = ref('');
+const linkSent = ref(false);
+
+const emailSchema = z.string().email('O e-mail fornecido não é válido');
+
 const goGoogle = () => {
   window.location.href = `${API_BASE_URL}/auth/google`;
+};
+
+const sendMagicLink = async () => {
+  const parsed = emailSchema.safeParse(email.value.trim());
+  if (!parsed.success) {
+    errorMessage.value = parsed.error.errors[0].message;
+    return;
+  }
+
+  isSending.value = true;
+  errorMessage.value = '';
+  try {
+    // resposta é sempre 204 — não revela se o e-mail já tem conta.
+    // redirect viaja DENTRO do link (sobrevive a outras abas/janelas).
+    await api.post('/auth/magic-link', {
+      email: email.value.trim(),
+      redirect: route.fullPath,
+    });
+    linkSent.value = true;
+  } catch (e) {
+    errorMessage.value = toMessage(e);
+  } finally {
+    isSending.value = false;
+  }
 };
 </script>
