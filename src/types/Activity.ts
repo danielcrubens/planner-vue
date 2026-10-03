@@ -1,9 +1,5 @@
-export interface ActivityProps {
-  title: string;
-  occurs_at: { hours: number; minutes: number; seconds: number };
-  date: string;
-}
+import type { ApiActivity } from './api';
 
-export interface ActivityListProps {
-  activities: ActivityProps[];
-}
+export type ActivityListProps = {
+  activities: ApiActivity[];
+};
