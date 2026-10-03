@@ -1,7 +1,10 @@
 export interface ConfirmTripModalProps {
   closeConfirmTripModal: () => void;
-  createTrip: () => void;
+  confirmTrip: () => void;
   ConfirmTripModalOpen: boolean;
-  ownerName: string;
-  ownerEmail: string;
+  destination: string;
+  formattedDate: string;
+  invitedCount: number;
+  isSubmitting: boolean;
+  errorMessage: string;
 }

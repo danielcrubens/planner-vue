@@ -5,7 +5,7 @@
       <input
         v-model="localDestination"
         :disabled="props.isGuestsInputOpen"
-        @input="handleDestinationInput"
+        @input="onDestinationInput"
         type="text"
         placeholder="Para onde você vai?"
         class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
@@ -17,7 +17,7 @@
       <VueDatePicker
         v-model="localDate"
         :disabled="props.isGuestsInputOpen"
-        @update:model-value="handleDateInput"
+        @update:model-value="onDateInput"
         class="picker"
         placeholder="Quando?"
         range
@@ -47,61 +47,51 @@
 
 <script setup lang="ts">
 import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
-import { ref, watch } from 'vue';
-import { useTripStore } from '../../store/tripStore';
+import { ref } from 'vue';
 import { z } from 'zod';
 import { DestinationDateProps } from '../../types/DestinationDate';
 
 
 const props = defineProps<DestinationDateProps>();
+const emit = defineEmits<{
+  (e: 'update:destination', value: string): void;
+  (e: 'update:date', value: Date[]): void;
+}>();
 const localDestination = ref(props.destination);
-const localDate = ref(props.date);
-const tripStore = useTripStore();
+const localDate = ref<Date[]>(props.date);
 const errorMessageDestination = ref('');
 const errorMessageDate = ref('');
 
 const destinationSchema = z.string().min(1, { message: "O destino é obrigatório" });
-const dateSchema = z.string().nonempty('A data é obrigatória');
 
 const handleContinue = () => {
   errorMessageDestination.value = '';
   errorMessageDate.value = '';
-  try {
-    destinationSchema.parse(localDestination.value);
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      errorMessageDestination.value = e.errors.map(err => err.message).join(', ');
-    }
+
+  const destinationResult = destinationSchema.safeParse(localDestination.value);
+  if (!destinationResult.success) {
+    errorMessageDestination.value = destinationResult.error.errors[0].message;
   }
-  try {
-    dateSchema.parse(localDate.value ? localDate.value.toString() : '');
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      errorMessageDate.value = e.errors.map(err => err.message).join(', ');
-    }
+
+  if (!localDate.value || localDate.value.length < 2) {
+    errorMessageDate.value = 'Selecione o período da viagem (ida e volta)';
   }
+
   if (!errorMessageDestination.value && !errorMessageDate.value) {
-    tripStore.setDestination(localDestination.value);
-    tripStore.setDate(localDate.value);
     props.openGuestsInput();
   }
 };
 
-const handleDestinationInput = () => {
+const onDestinationInput = (event: Event) => {
   errorMessageDestination.value = '';
+  emit('update:destination', (event.target as HTMLInputElement).value);
 };
 
-const handleDateInput = () => {
+const onDateInput = (value: Date[] | null) => {
   errorMessageDate.value = '';
+  localDate.value = value ?? [];
+  emit('update:date', localDate.value);
 };
-
-watch(() => props.destination, (newValue) => {
-  localDestination.value = newValue;
-});
-
-watch(() => props.date, (newValue) => {
-  localDate.value = newValue;
-});
 </script>
 
 <style  scss>
@@ -140,6 +130,7 @@ watch(() => props.date, (newValue) => {
     font-size: 1.125rem;
     font-family: Inter, sans-serif;
     padding: 0;
+    background: transparent;
     @media screen and (max-width: 640px) {
       font-size: 1rem;
     }

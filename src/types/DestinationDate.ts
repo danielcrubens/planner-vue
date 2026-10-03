@@ -2,6 +2,6 @@ export interface DestinationDateProps {
   isGuestsInputOpen: boolean;
   closeGuestsInput: () => void;
   openGuestsInput: () => void;
-  date: string[];
+  date: Date[];
   destination: string;
 }
