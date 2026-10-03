@@ -2,12 +2,12 @@
   <div class="md:px-4 px-1 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
     <div class="flex items-center gap-2">
       <MapPin class="size-5 text-zinc-400" />
-      <input 
-        v-model="localDestination" 
-        :readonly="!isEditing" 
-        type="text" 
-        class="text-zinc-100 focus:outline-none focus:border-lime-300 bg-transparent w-full" 
-        placeholder="Destino" 
+      <input
+        v-model="localDestination"
+        :readonly="!isEditing"
+        type="text"
+        class="text-zinc-100 focus:outline-none focus:border-lime-300 bg-transparent w-full"
+        placeholder="Destino"
       />
     </div>
     <div class="flex items-center gap-5">
@@ -16,7 +16,6 @@
         <VueDatePicker
           v-model="localDate"
           :disabled="!isEditing"
-          @update:model-value="handleDateInput"
           class="picker"
           placeholder="Quando?"
           range
@@ -24,53 +23,67 @@
         />
       </div>
       <div class="w-px h-6 bg-zinc-800" />
-      <Button class="bg-zinc-800 text-zinc-200 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-zinc-700"variant="secondary" @click="toggleEditing">
-        {{ isEditing ? 'Salvar' : 'Alterar local/data' }}
+      <Button v-if="isOwner" variant="secondary" :disabled="isSaving" @click="toggleEditing">
+        {{ isSaving ? 'Salvando...' : isEditing ? 'Salvar' : 'Alterar local/data' }}
         <Settings2 class="size-5" />
       </Button>
     </div>
+    <p v-if="errorMessage" class="text-red-500 text-xs absolute mt-14">{{ errorMessage }}</p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { Settings2, MapPin, Calendar } from "lucide-vue-next";
 import { useTripStore } from '@/store/tripStore';
-import { format } from 'date-fns';
+import { useAuthStore } from '@/store/authStore';
+import { errorMessage as toMessage } from '@/store/tripStore';
+import Button from "../components/Button/Button.vue";
 
 const tripStore = useTripStore();
+const auth = useAuthStore();
 const isEditing = ref(false);
+const isSaving = ref(false);
+const errorMessage = ref('');
 
-const localDestination = ref(tripStore.destination);
-const localDate = ref(tripStore.date);
+const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
 
-const formattedDate = computed(() => {
-  if (!localDate.value || localDate.value.length === 0) return '';
-  const formattedStartDate = format(new Date(localDate.value[0]), 'dd/MM/yyyy');
-  const formattedEndDate = localDate.value[1] ? format(new Date(localDate.value[1]), 'dd/MM/yyyy') : '';
-  return formattedEndDate ? `${formattedStartDate} - ${formattedEndDate}` : formattedStartDate;
-});
+const localDestination = ref(tripStore.trip?.destination ?? '');
+const localDate = ref([]);
 
-const toggleEditing = () => {
+const toggleEditing = async () => {
+  errorMessage.value = '';
   if (isEditing.value) {
-    // Salvar as alterações no tripStore
-    tripStore.setDestination(localDestination.value);
-    tripStore.setDate(localDate.value);
+    if (!localDestination.value || !localDate.value || localDate.value.length < 2) {
+      errorMessage.value = 'Informe destino e período completos';
+      return;
+    }
+    isSaving.value = true;
+    try {
+      await tripStore.updateTrip(tripStore.trip.id, {
+        destination: localDestination.value,
+        starts_at: toISODate(localDate.value[0]),
+        ends_at: toISODate(localDate.value[1]),
+      });
+    } catch (e) {
+      errorMessage.value = toMessage(e);
+      isSaving.value = false;
+      return;
+    }
+    isSaving.value = false;
   }
   isEditing.value = !isEditing.value;
 };
 
-const handleDateInput = (selectedDates) => {
-  localDate.value = selectedDates;
-};
+const toISODate = (value) => new Date(value).toISOString().slice(0, 10);
 
-// Observar mudanças no store e atualizar os valores locais
-watch(() => tripStore.destination, (newDestination) => {
-  localDestination.value = newDestination;
-});
-
-watch(() => tripStore.date, (newDate) => {
-  localDate.value = newDate;
-});
+watch(
+  () => tripStore.trip,
+  (trip) => {
+    if (!trip) return;
+    localDestination.value = trip.destination;
+    localDate.value = [new Date(trip.startsAt), new Date(trip.endsAt)];
+  },
+  { immediate: true },
+);
 </script>
-

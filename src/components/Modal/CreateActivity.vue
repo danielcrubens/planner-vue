@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.isCreateActivityModalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center">
+  <div v-if="props.isCreateActivityModalOpen" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
     <div class="md:w-[640px] w-11/12 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
@@ -36,8 +36,9 @@
             </div>
           </div>
         </div>
-        <Button type="submit" variant="primary" size="full">
-          Salvar atividade
+        <p v-if="submitError" class="text-red-500 text-xs">{{ submitError }}</p>
+        <Button type="submit" variant="primary" size="full" :disabled="isSubmitting">
+          {{ isSubmitting ? 'Salvando...' : 'Salvar atividade' }}
         </Button>
       </form>
     </div>
@@ -53,45 +54,60 @@ import { ref } from "vue";
 import { z } from 'zod';
 import { ptBR } from 'date-fns/locale';
 import { CreateActivityProps } from '../../types/CreateActivity';
+import { errorMessage as toMessage } from '@/store/tripStore';
 
 const errorMessageTitle = ref('');
 const errorMessageTime = ref('');
 const errorMessageDate = ref('');
+const isSubmitting = ref(false);
+const submitError = ref('');
 const props = defineProps<CreateActivityProps>();
-const formData = ref({ title: '', occurs_at: '', date: '' });
+const formData = ref({ title: '', occurs_at: null as Date | null, date: null as Date | null });
 
 const titleSchema = z.string().min(1, { message: "O nome da atividade é obrigatório" });
-const timeSchema = z.string().nonempty('A hora é obrigatória');
-const dateSchema = z.string().nonempty('A data é obrigatória');
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   errorMessageTitle.value = '';
   errorMessageTime.value = '';
+  errorMessageDate.value = '';
+  submitError.value = '';
+
+  const titleResult = titleSchema.safeParse(formData.value.title);
+  if (!titleResult.success) {
+    errorMessageTitle.value = titleResult.error.errors[0].message;
+  }
+  if (!formData.value.occurs_at) {
+    errorMessageTime.value = 'A hora é obrigatória';
+  }
+  if (!formData.value.date) {
+    errorMessageDate.value = 'A data é obrigatória';
+  }
+  if (errorMessageTitle.value || errorMessageTime.value || errorMessageDate.value) return;
+
+  isSubmitting.value = true;
   try {
-    titleSchema.parse(formData.value.title);
+    await props.submitActivity({
+      title: formData.value.title,
+      occurs_at: toISODateTime(formData.value.date!, formData.value.occurs_at!),
+    });
+    formData.value = { title: '', occurs_at: null, date: null };
   } catch (e) {
-    if (e instanceof z.ZodError) {
-      errorMessageTitle.value = e.errors.map(err => err.message).join(', ');
-    }
+    submitError.value = toMessage(e);
+  } finally {
+    isSubmitting.value = false;
   }
-  try {
-    timeSchema.parse(formData.value.occurs_at ? formData.value.occurs_at.toString() : '');
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      errorMessageTime.value = e.errors.map(err => err.message).join(', ');
-    }
-  }
-  try {
-    dateSchema.parse(formData.value.date ? formData.value.date.toString() : '');
-  } catch (e) {
-    if (e instanceof z.ZodError) {
-      errorMessageDate.value = e.errors.map(err => err.message).join(', ');
-    }
-  }
-  if (!errorMessageTitle.value && !errorMessageTime.value && !errorMessageDate.value) {
-    props.submitActivity(formData.value);
-    formData.value = { title: '', occurs_at: '', date: '' };
-  }
+};
+
+/** Data + hora dos dois pickers → ISO com timezone local (backend valida o período da viagem) */
+const toISODateTime = (date: Date, time: Date): string => {
+  const combined = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    time.getHours(),
+    time.getMinutes(),
+  );
+  return combined.toISOString();
 };
 
 const clearTitleError = () => {
