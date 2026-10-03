@@ -1,5 +1,7 @@
 <template>
   <div class="md:max-w-6xl md:px-6 px-3 py-10 mx-auto md:space-x-8">
+    <UserMenu />
+
     <p v-if="tripStore.isLoading" class="text-zinc-400 py-10">Carregando viagem...</p>
 
     <div v-else-if="tripStore.error" class="py-10 space-y-3">
@@ -44,6 +46,7 @@ import Activities from "../views/Activities.vue";
 import Guests from "../views/Guests.vue";
 import HeaderDestination from "../views/HeaderDestination.vue";
 import CreateActivity from "../components/Modal/CreateActivity.vue";
+import UserMenu from '@/components/UserMenu.vue';
 import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
 

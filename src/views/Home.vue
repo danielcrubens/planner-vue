@@ -1,15 +1,6 @@
 <template>
-  <div class="h-screen flex items-center justify-center bg-pattern bg-no-repeat bg-center overflow-y-auto relative">
-    <div v-if="firstName" class="absolute top-6 right-6 flex items-center gap-3">
-      <span class="hidden md:block text-sm text-zinc-400">{{ auth.user?.email }}</span>
-      <button
-        @click="logout"
-        class="flex items-center gap-2 text-sm text-zinc-300 hover:text-zinc-100 bg-zinc-900/80 hover:bg-zinc-800 rounded-lg px-3 py-2 transition-colors"
-      >
-        <LogOut class="size-4" />
-        Sair
-      </button>
-    </div>
+  <div class="h-screen flex items-center justify-center bg-pattern bg-no-repeat bg-center overflow-y-auto">
+    <UserMenu @login="isAuthModalOpen = true" />
 
     <div class="max-w-3xl w-full px-6 py-10 text-center space-y-10">
       <div class="flex flex-col items-center gap-3">
@@ -93,7 +84,8 @@
 <script setup>
 import { computed, onMounted, ref, watch } from "vue";
 import { useRouter, RouterLink } from 'vue-router';
-import { MapPin, LogOut } from "lucide-vue-next";
+import { MapPin } from "lucide-vue-next";
+import UserMenu from '@/components/UserMenu.vue';
 import InviteGuestsModal from "@/components/Modal/InviteGuestsModal.vue";
 import ConfirmTripModalOpen from "@/components/Modal/ConfirmTripModal.vue";
 import AuthModal from "@/components/Modal/AuthModal.vue";
@@ -152,20 +144,17 @@ const closeAuthModal = () => {
 
 const onAuthenticated = () => {
   isAuthModalOpen.value = false;
-  if (pendingContinue.value) {
-    pendingContinue.value = false;
+  // Só segue o fluxo se destino e período já estavam preenchidos;
+  // caso contrário o usuário preenche e clica "Continuar" (agora validado).
+  if (pendingContinue.value && destination.value && date.value?.length >= 2) {
     isGuestsInputOpen.value = true;
   }
+  pendingContinue.value = false;
   tripStore.fetchTrips().catch(() => {});
 };
 
 const addNewEmailToInvite = (email) => {
   emailsToInvite.value.push(email);
-};
-
-const logout = async () => {
-  await auth.logout();
-  window.location.assign('/');
 };
 
 const removeEmailFromInvites = (emailToRemove) => {

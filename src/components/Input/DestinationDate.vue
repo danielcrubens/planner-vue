@@ -49,6 +49,7 @@
 import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
 import { ref } from 'vue';
 import { z } from 'zod';
+import { useAuthStore } from '@/store/authStore';
 import { DestinationDateProps } from '../../types/DestinationDate';
 
 
@@ -57,6 +58,7 @@ const emit = defineEmits<{
   (e: 'update:destination', value: string): void;
   (e: 'update:date', value: Date[]): void;
 }>();
+const auth = useAuthStore();
 const localDestination = ref(props.destination);
 const localDate = ref<Date[]>(props.date);
 const errorMessageDestination = ref('');
@@ -65,6 +67,12 @@ const errorMessageDate = ref('');
 const destinationSchema = z.string().min(1, { message: "O destino é obrigatório" });
 
 const handleContinue = () => {
+  // Sem sessão o clique vai para o modal de login; a validação roda depois, quando logado.
+  if (!auth.isAuthenticated) {
+    props.openGuestsInput();
+    return;
+  }
+
   errorMessageDestination.value = '';
   errorMessageDate.value = '';
 
