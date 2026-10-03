@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.isGuestsModalOpen" class="fixed inset-0 bg-black/60 flex items-center justify-center">
+  <div v-if="props.isGuestsModalOpen" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
     <div class="w-[640px] rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5 h-[50vh]">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
@@ -24,10 +24,10 @@
       <form @submit.prevent="addNewEmail" class="p-2.5 lg:bg-zinc-950 border border-zinc-800 rounded-lg flex flex-col md:flex-row md:items-center gap-2">
         <div class="lg:px-2 lg:py-0 py-2.5 px-2.5  flex items-center flex-1 border lg:border-0 border-zinc-800 rounded-lg gap-y-7 gap-x-2 relative bg-zinc-950">
           <AtSign class="text-zinc-400 size-5" />
-          <input 
-            v-model="newEmail"  
+          <input
+            v-model="newEmail"
             placeholder="Digite o e-mail do convidado"
-            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1" 
+            class="bg-transparent md:text-lg placeholder-zinc-400 outline-none flex-1"
             @input="clearValidationError"
           />
           <div v-if="validationError" class="text-red-500 px-2 text-xs absolute -bottom-4 ">
@@ -36,7 +36,7 @@
         </div>
         <button type="submit"
           class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 mt-4 lg:mt-0 font-medium flex items-center gap-2 hover:bg-lime-400">
-          Convidar
+          Enviar convite
           <Plus class="size-5" />
         </button>
       </form>
@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { AtSign, Plus, X } from "lucide-vue-next";
-import { defineProps, ref } from 'vue';
+import { ref } from 'vue';
 import { z } from 'zod';
 import { InviteGuestsModalProps } from '../../types/InviteGuestsModal';
 
@@ -64,6 +64,12 @@ const validationSchema = z.object({
 
 
 const props = defineProps<InviteGuestsModalProps>();
+
+const emit = defineEmits<{
+  (e: 'closer'): void;
+  (e: 'addNewEmailToInvite', email: string): void;
+  (e: 'removeEmailFromInvites', email: string): void;
+}>();
 
 const newEmail = ref("");
 const emailAlreadyAdded = ref(false);
@@ -80,16 +86,17 @@ const addNewEmail = async () => {
   }
 
   if (props.emailsToInvite.includes(email)) {
-    emailAlreadyAdded.value = true; 
+    emailAlreadyAdded.value = true;
     setTimeout(() => {
       emailAlreadyAdded.value = false;
     }, 3000);
-  } else {
-    props.emailsToInvite.push(email);
-    newEmail.value = "";
-    emailAlreadyAdded.value = false;
-    validationError.value = null;
+    return;
   }
+
+  emit('addNewEmailToInvite', email);
+  newEmail.value = "";
+  emailAlreadyAdded.value = false;
+  validationError.value = null;
 };
 
 const clearValidationError = () => {
