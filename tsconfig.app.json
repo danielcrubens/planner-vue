@@ -17,10 +17,17 @@
     "noEmit": true,
     "jsx": "preserve",
 
+    /* Alias do Vite (vite.config.ts resolve.@) também no TypeScript */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

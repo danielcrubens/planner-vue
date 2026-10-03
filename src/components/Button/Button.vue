@@ -3,7 +3,8 @@
     :class="{
       'rounded-lg px-5 font-medium flex items-center justify-center gap-2': true,
       ...variantclass,
-      ...sizeclass
+      ...sizeclass,
+      'opacity-60 cursor-not-allowed': !!$attrs.disabled
     }"
     v-bind="$attrs"
   >
