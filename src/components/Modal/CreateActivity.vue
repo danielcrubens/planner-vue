@@ -3,13 +3,16 @@
     <div class="md:w-[640px] w-11/12 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
       <div class="space-y-2">
         <div class="flex items-center justify-between">
-          <h2 class="font-lg font-semibold">Cadastrar atividade</h2>
+          <h2 class="font-lg font-semibold">{{ activityToEdit ? 'Editar atividade' : 'Cadastrar atividade' }}</h2>
           <button>
             <X class="size-5 text-zinc-400" @click="$emit('closeCreateActivityModal')" />
           </button>
         </div>
         <p class="text-sm text-zinc-400">
           Todos convidados podem visualizar as atividades.
+        </p>
+        <p v-if="tripPeriod" class="text-xs text-zinc-500">
+          Período da viagem: <span class="text-zinc-300">{{ tripPeriod }}</span>
         </p>
       </div>
       <form @submit.prevent="handleSubmit" class="space-y-3">
@@ -31,14 +34,15 @@
           <div class="h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2 relative">
             <Calendar class="text-zinc-400 size-5" />
             <VueDatePicker v-model="formData.date" placeholder="Data" :format="dateFormat" :format-locale="formatLocale"
-              :week-days="weekDays" auto-apply hide-time-header @update:model-value="clearDateError" />
+              :week-days="weekDays" auto-apply hide-time-header :min-date="minDate" :max-date="maxDate"
+              @update:model-value="clearDateError" />
             <div v-if="errorMessageDate" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDate }}
             </div>
           </div>
         </div>
         <p v-if="submitError" class="text-red-500 text-xs">{{ submitError }}</p>
         <Button type="submit" variant="primary" size="full" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Salvando...' : 'Salvar atividade' }}
+          {{ isSubmitting ? 'Salvando...' : activityToEdit ? 'Salvar alterações' : 'Salvar atividade' }}
         </Button>
       </form>
     </div>
@@ -50,7 +54,7 @@ import { Tag, X, Calendar, Clock3 } from "lucide-vue-next";
 import Button from "@/components/Button/Button.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { z } from 'zod';
 import { ptBR } from 'date-fns/locale';
 import { CreateActivityProps } from '../../types/CreateActivity';
@@ -62,7 +66,22 @@ const errorMessageDate = ref('');
 const isSubmitting = ref(false);
 const submitError = ref('');
 const props = defineProps<CreateActivityProps>();
+const emit = defineEmits<{ (e: 'closeCreateActivityModal'): void }>();
 const formData = ref({ title: '', occurs_at: null as Date | null, date: null as Date | null });
+
+// modo edição: pré-preenche a partir da atividade selecionada
+watch(
+  () => props.activityToEdit,
+  (activity) => {
+    if (!activity) {
+      formData.value = { title: '', occurs_at: null, date: null };
+      return;
+    }
+    const occurs = new Date(activity.occursAt);
+    formData.value = { title: activity.title, occurs_at: occurs, date: occurs };
+  },
+  { immediate: true },
+);
 
 const titleSchema = z.string().min(1, { message: "O nome da atividade é obrigatório" });
 
@@ -86,11 +105,13 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true;
   try {
-    console.log('[atividade] date picker →', formData.value.date, '| time picker →', formData.value.occurs_at);
-    await props.submitActivity({
-      title: formData.value.title,
-      occurs_at: toISODateTime(formData.value.date!, formData.value.occurs_at!),
-    });
+    await props.submitActivity(
+      {
+        title: formData.value.title,
+        occurs_at: toISODateTime(formData.value.date!, formData.value.occurs_at!),
+      },
+      props.activityToEdit?.id,
+    );
     formData.value = { title: '', occurs_at: null, date: null };
   } catch (e) {
     submitError.value = toMessage(e);
@@ -135,6 +156,29 @@ const clearDateError = () => {
 const dateFormat = 'dd/MM/yyyy';
 const formatLocale = ptBR;
 const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+/** Datas do banco são meia-noite UTC; o dia gravado é o slice do ISO
+ *  (formatar com Date local deslocaria um dia em fusos negativos). */
+const storedDay = (iso: string) => iso.slice(0, 10).split('-').reverse().join('/');
+const localMidnight = (iso: string) => {
+  const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d);
+};
+
+/** Limites do período da viagem (o backend continua validando como fonte de verdade).
+ *  maxDate vai até o FIM do último dia — meia-noite cortaria o próprio dia final. */
+const minDate = computed(() => (props.tripStartsAt ? localMidnight(props.tripStartsAt) : undefined));
+const maxDate = computed(() => {
+  if (!props.tripEndsAt) return undefined;
+  const [y, m, d] = props.tripEndsAt.slice(0, 10).split('-').map(Number);
+  return new Date(y, m - 1, d, 23, 59, 59);
+});
+const tripPeriod = computed(() => {
+  if (!props.tripStartsAt || !props.tripEndsAt) return '';
+  const start = storedDay(props.tripStartsAt);
+  const end = storedDay(props.tripEndsAt);
+  return start === end ? start : `${start} – ${end}`;
+});
 </script>
 
 <style scss>

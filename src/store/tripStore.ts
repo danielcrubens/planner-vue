@@ -56,6 +56,20 @@ export const useTripStore = defineStore('trip', {
       return data;
     },
 
+    async updateActivity(tripId: string, activityId: string, payload: { title: string; occurs_at: string }) {
+      const { data } = await api.patch<ApiActivity>(`/trips/${tripId}/activities/${activityId}`, payload);
+      if (this.trip) {
+        this.trip.activities = this.trip.activities.map((a) => (a.id === activityId ? data : a));
+      }
+    },
+
+    async removeActivity(tripId: string, activityId: string) {
+      await api.delete(`/trips/${tripId}/activities/${activityId}`);
+      if (this.trip) {
+        this.trip.activities = this.trip.activities.filter((a) => a.id !== activityId);
+      }
+    },
+
     async invite(tripId: string, emails: string[]): Promise<ApiParticipant[]> {
       const { data } = await api.post(`/trips/${tripId}/invites`, { emails });
       if (this.trip) this.trip.participants = data.participants;

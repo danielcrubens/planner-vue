@@ -10,11 +10,26 @@
         :key="activity.id"
         class="px-4 py-2.5 bg-zinc-900 rounded-xl shadow-shape flex items-center gap-3"
       >
-        <CircleCheck class="size-5 text-lime-300" />
+        <CircleCheck class="size-5 text-lime-300 shrink-0" />
         <span class="text-zinc-100">{{ activity.title }}</span>
         <span class="text-zinc-400 text-sm ml-auto">{{ formatHour(activity.occursAt) }}</span>
+        <template v-if="isOwner">
+          <button type="button" @click="$emit('edit', activity)" aria-label="Editar atividade">
+            <Pencil class="size-4 text-zinc-400 hover:text-zinc-200" />
+          </button>
+          <button
+            type="button"
+            :disabled="isRemoving === activity.id"
+            @click="removeActivity(activity)"
+            aria-label="Excluir atividade"
+          >
+            <Trash2 class="size-4 text-zinc-400 hover:text-red-400" />
+          </button>
+        </template>
       </div>
     </div>
+
+    <p v-if="removeError" class="text-red-500 text-xs">{{ removeError }}</p>
 
     <p v-if="days.length === 0" class="text-zinc-400 text-sm">
       Nenhuma atividade cadastrada ainda.
@@ -23,13 +38,38 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
-import { CircleCheck } from "lucide-vue-next";
+import { computed, ref } from "vue";
+import { CircleCheck, Pencil, Trash2 } from "lucide-vue-next";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ActivityListProps } from '../types/Activity';
+import type { ApiActivity } from '@/types/api';
+import { useTripStore } from '@/store/tripStore';
+import { useAuthStore } from '@/store/authStore';
+import { errorMessage as toMessage } from '@/store/tripStore';
 
 const props = defineProps<ActivityListProps>();
+const emit = defineEmits<{ (e: 'edit', activity: ApiActivity): void }>();
+const tripStore = useTripStore();
+const auth = useAuthStore();
+
+const isRemoving = ref('');
+const removeError = ref('');
+
+const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
+
+const removeActivity = async (activity: ApiActivity) => {
+  if (!window.confirm(`Excluir a atividade "${activity.title}"?`)) return;
+  removeError.value = '';
+  isRemoving.value = activity.id;
+  try {
+    await tripStore.removeActivity(tripStore.trip!.id, activity.id);
+  } catch (e) {
+    removeError.value = toMessage(e);
+  } finally {
+    isRemoving.value = '';
+  }
+};
 
 const days = computed(() => {
   const grouped = new Map<string, typeof props.activities>();

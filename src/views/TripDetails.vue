@@ -20,7 +20,7 @@
               Cadastrar atividade
             </button>
           </div>
-          <Activities :activities="trip.activities" />
+          <Activities :activities="trip.activities" @edit="onEditActivity" />
         </div>
         <div class="w-80 space-y-6">
           <ImportantLinks />
@@ -32,6 +32,9 @@
         :isCreateActivityModalOpen="isCreateActivityModalOpen"
         @closeCreateActivityModal="closeCreateActivityModal"
         :submitActivity="handleActivitySubmit"
+        :activityToEdit="editingActivity"
+        :tripStartsAt="trip.startsAt"
+        :tripEndsAt="trip.endsAt"
       />
     </template>
   </div>
@@ -57,6 +60,7 @@ const auth = useAuthStore();
 const trip = computed(() => tripStore.trip);
 const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
 const isCreateActivityModalOpen = ref(false);
+const editingActivity = ref(null);
 
 const loadTrip = () => tripStore.fetchTrip(route.params.id);
 
@@ -64,6 +68,12 @@ onMounted(loadTrip);
 watch(() => route.params.id, loadTrip);
 
 const openCreateActivityModal = () => {
+  editingActivity.value = null;
+  isCreateActivityModalOpen.value = true;
+};
+
+const onEditActivity = (activity) => {
+  editingActivity.value = activity;
   isCreateActivityModalOpen.value = true;
 };
 
@@ -71,8 +81,12 @@ const closeCreateActivityModal = () => {
   isCreateActivityModalOpen.value = false;
 };
 
-const handleActivitySubmit = async (formData) => {
-  await tripStore.addActivity(trip.value.id, formData);
+const handleActivitySubmit = async (formData, activityId) => {
+  if (activityId) {
+    await tripStore.updateActivity(trip.value.id, activityId, formData);
+  } else {
+    await tripStore.addActivity(trip.value.id, formData);
+  }
   closeCreateActivityModal();
 };
 </script>
