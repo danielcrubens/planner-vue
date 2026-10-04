@@ -86,6 +86,7 @@ const handleSubmit = async () => {
 
   isSubmitting.value = true;
   try {
+    console.log('[atividade] date picker →', formData.value.date, '| time picker →', formData.value.occurs_at);
     await props.submitActivity({
       title: formData.value.title,
       occurs_at: toISODateTime(formData.value.date!, formData.value.occurs_at!),
@@ -98,16 +99,26 @@ const handleSubmit = async () => {
   }
 };
 
-/** Data + hora dos dois pickers → ISO com timezone local (backend valida o período da viagem) */
-const toISODateTime = (date: Date, time: Date): string => {
-  const combined = new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    time.getHours(),
-    time.getMinutes(),
-  );
-  return combined.toISOString();
+/** Data + hora dos dois pickers → ISO com timezone local.
+ *  Tolerante aos formatos do VueDatePicker: Date, {hours,minutes} ou "HH:mm". */
+const toISODateTime = (date: unknown, time: unknown): string => {
+  const d = date instanceof Date ? date : new Date(String(date));
+
+  let hours = 0;
+  let minutes = 0;
+  if (time instanceof Date) {
+    hours = time.getHours();
+    minutes = time.getMinutes();
+  } else if (time && typeof time === 'object') {
+    hours = Number((time as { hours: number }).hours ?? 0);
+    minutes = Number((time as { minutes: number }).minutes ?? 0);
+  } else {
+    const [h, m] = String(time).split(':');
+    hours = Number(h);
+    minutes = Number(m ?? 0);
+  }
+
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, minutes).toISOString();
 };
 
 const clearTitleError = () => {
