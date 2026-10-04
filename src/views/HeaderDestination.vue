@@ -20,6 +20,8 @@
           placeholder="Quando?"
           range
           :enable-time-picker="false"
+          format="dd/MM/yyyy"
+          :format-locale="formatLocale"
         />
       </div>
       <div class="w-px h-6 bg-zinc-800" />
@@ -35,6 +37,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue';
 import { Settings2, MapPin, Calendar } from "lucide-vue-next";
+import { ptBR } from 'date-fns/locale';
 import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
 import { errorMessage as toMessage } from '@/store/tripStore';
@@ -42,6 +45,7 @@ import Button from "../components/Button/Button.vue";
 
 const tripStore = useTripStore();
 const auth = useAuthStore();
+const formatLocale = ptBR;
 const isEditing = ref(false);
 const isSaving = ref(false);
 const errorMessage = ref('');

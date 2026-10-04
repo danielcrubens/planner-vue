@@ -132,7 +132,7 @@ const clearDateError = () => {
   errorMessageDate.value = '';
 };
 
-const dateFormat = 'dd MMMM, EEEE';
+const dateFormat = 'dd/MM/yyyy';
 const formatLocale = ptBR;
 const weekDays = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
 </script>

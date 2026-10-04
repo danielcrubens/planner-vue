@@ -22,6 +22,8 @@
         placeholder="Quando?"
         range
         :enable-time-picker="false"
+        format="dd/MM/yyyy"
+        :format-locale="formatLocale"
       />
       <div v-if="errorMessageDate" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDate }}</div>
     </div>
@@ -49,8 +51,11 @@
 import { ArrowRight, Settings2, Calendar, MapPin } from "lucide-vue-next";
 import { ref } from 'vue';
 import { z } from 'zod';
+import { ptBR } from 'date-fns/locale';
 import { useAuthStore } from '@/store/authStore';
 import { DestinationDateProps } from '../../types/DestinationDate';
+
+const formatLocale = ptBR;
 
 
 const props = defineProps<DestinationDateProps>();
