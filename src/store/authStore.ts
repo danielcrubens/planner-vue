@@ -45,6 +45,13 @@ export const useAuthStore = defineStore('auth', {
       return data.redirect ?? null;
     },
 
+    /** O link de convite é a credencial: aceite + sessão num passo só. */
+    async acceptInvite(token: string): Promise<{ tripId: string }> {
+      const { data } = await api.post(`/invites/${token}/accept`);
+      this.setSession(data.user, data.accessToken);
+      return { tripId: data.tripId };
+    },
+
     async refresh() {
       const { data } = await api.post('/auth/refresh');
       this.accessToken = data.accessToken;

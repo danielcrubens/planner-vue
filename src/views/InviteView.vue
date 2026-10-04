@@ -1,108 +1,99 @@
 <template>
   <div class="h-screen flex items-center justify-center bg-pattern bg-no-repeat bg-center">
-    <div class="max-w-md w-full px-6 text-center space-y-6">
+    <div class="max-w-md w-full px-6 text-center space-y-5">
       <img src="/logo.svg" alt="plann.er" class="mx-auto" />
 
-      <p v-if="isLoading" class="text-zinc-400 text-lg">Carregando convite...</p>
-
-      <div v-else-if="error" class="rounded-xl bg-zinc-900 shadow-shape p-6 space-y-3">
-        <p class="text-red-500">{{ error }}</p>
-        <RouterLink to="/" class="text-lime-300 underline text-sm">Ir para o plann.er</RouterLink>
+      <div v-if="state === 'loading'" class="space-y-3">
+        <p class="text-zinc-300 text-lg">Entrando na viagem...</p>
+        <div class="mx-auto size-6 border-2 border-zinc-600 border-t-lime-300 rounded-full animate-spin" />
       </div>
 
-      <div v-else-if="invite" class="rounded-xl bg-zinc-900 shadow-shape p-6 space-y-4">
-        <p class="text-zinc-400">
-          Você foi convidado para participar da viagem:
-        </p>
-        <h1 class="text-2xl font-semibold text-zinc-100">{{ invite.trip.destination }}</h1>
-        <p class="text-zinc-400 text-sm">{{ formatDateRange(invite.trip) }}</p>
-        <p class="text-zinc-500 text-xs">Convite enviado para {{ invite.email }}</p>
+      <div v-else class="rounded-xl bg-zinc-900 shadow-shape p-6 space-y-4">
+        <p :class="isFatal ? 'text-red-500' : 'text-zinc-300'">{{ message }}</p>
 
-        <p class="text-zinc-400 text-sm">
-          Entre com a conta Google deste e-mail para <span class="text-zinc-200 font-medium">confirmar sua presença</span> e ver a viagem.
-        </p>
+        <button
+          v-if="code === 'EMAIL_MISMATCH'"
+          type="button"
+          class="w-full h-11 bg-lime-300 text-lime-950 rounded-lg font-medium hover:bg-lime-400 transition-colors"
+          :disabled="isRetrying"
+          @click="switchAccount"
+        >
+          {{ isRetrying ? 'Entrando...' : 'Entrar com o e-mail do convite' }}
+        </button>
 
-        <p v-if="acceptError" class="text-red-500 text-xs">{{ acceptError }}</p>
+        <RouterLink
+          v-else-if="code === 'INVITE_ALREADY_USED'"
+          to="/"
+          class="block h-11 leading-[2.75rem] bg-zinc-800 text-zinc-200 rounded-lg font-medium hover:bg-zinc-700 transition-colors"
+        >
+          Ir para minhas viagens
+        </RouterLink>
 
-        <Button variant="primary" size="full" :disabled="isAccepting" @click="accept">
-          {{ isAccepting ? 'Aceitando...' : 'Aceitar convite' }}
-        </Button>
+        <RouterLink
+          v-else
+          to="/"
+          class="text-lime-300 underline text-sm inline-block"
+        >
+          Voltar para o plann.er
+        </RouterLink>
       </div>
     </div>
-
-    <AuthModal :isOpen="isAuthModalOpen" @closer="isAuthModalOpen = false" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
-import { format } from 'date-fns';
-import Button from '@/components/Button/Button.vue';
-import AuthModal from '@/components/Modal/AuthModal.vue';
-import { api } from '@/services/api/axios';
 import { useAuthStore } from '@/store/authStore';
-import { errorMessage as toMessage } from '@/store/tripStore';
-
-interface InvitePreview {
-  email: string;
-  trip: { destination: string; startsAt: string; endsAt: string };
-}
 
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 
-const invite = ref<InvitePreview | null>(null);
-const isLoading = ref(true);
-const error = ref('');
-const acceptError = ref('');
-const isAccepting = ref(false);
-const isAuthModalOpen = ref(false);
+const state = ref<'loading' | 'error'>('loading');
+const code = ref('');
+const message = ref('');
+const isRetrying = ref(false);
+
+// fatal = nenhuma ação local resolve; senão oferecemos caminho de saída
+const isFatal = ref(true);
 
 const token = route.params.token as string;
-const REDIRECT_KEY = 'planner.auth_redirect';
 
-const formatDateRange = (trip: InvitePreview['trip']) => {
-  const start = format(new Date(trip.startsAt), 'dd/MM/yyyy');
-  const end = format(new Date(trip.endsAt), 'dd/MM/yyyy');
-  return end === start ? start : `${start} a ${end}`;
-};
-
-onMounted(async () => {
-  // aba nova tem auth.user vazio na memória, mas pode haver sessão válida
-  // no cookie — restaura antes de decidir se o modal de login é preciso.
-  await auth.ensureAuth().catch(() => false);
-
-  try {
-    const { data } = await api.get<InvitePreview>(`/invites/${token}`);
-    invite.value = data;
-  } catch (e) {
-    error.value = toMessage(e);
-  } finally {
-    isLoading.value = false;
+const friendly = (inviteCode: string): string => {
+  switch (inviteCode) {
+    case 'INVITE_EXPIRED':
+      return 'Este convite expirou. Peça um novo convite ao organizador.';
+    case 'INVITE_ALREADY_USED':
+      return 'Este convite já foi utilizado. Se foi você quem aceitou, sua viagem está em "Suas viagens".';
+    case 'INVITE_INVALID':
+      return 'Este link de convite é inválido. Confira o link recebido por e-mail.';
+    case 'EMAIL_MISMATCH':
+      return 'Você está logado com um e-mail diferente do convidado.';
+    default:
+      return 'Não foi possível aceitar o convite. Tente novamente.';
   }
-});
+};
 
 const accept = async () => {
-  acceptError.value = '';
-
-  // Sem sessão: guarda para onde voltar depois do Google e pede login.
-  if (!auth.isAuthenticated) {
-    sessionStorage.setItem(REDIRECT_KEY, route.fullPath);
-    isAuthModalOpen.value = true;
-    return;
-  }
-
-  isAccepting.value = true;
+  state.value = 'loading';
   try {
-    const { data } = await api.post<{ tripId: string }>(`/invites/${token}/accept`);
-    router.replace(`/trips/${data.tripId}`);
+    const { tripId } = await auth.acceptInvite(token);
+    router.replace(`/trips/${tripId}`);
   } catch (e) {
-    acceptError.value = toMessage(e);
-    isAuthModalOpen.value = false;
-  } finally {
-    isAccepting.value = false;
+    code.value = (e as { response?: { data?: { code?: string } } }).response?.data?.code ?? '';
+    message.value = friendly(code.value);
+    isFatal.value = code.value !== 'EMAIL_MISMATCH' && code.value !== 'INVITE_ALREADY_USED';
+    state.value = 'error';
   }
 };
+
+/** EMAIL_MISMATCH: sai da sessão atual e refaz o aceite com o e-mail do convite */
+const switchAccount = async () => {
+  isRetrying.value = true;
+  await auth.logout();
+  await accept();
+};
+
+onMounted(accept);
 </script>

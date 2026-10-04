@@ -1,8 +1,8 @@
 <template>
   <div class="space-y-2">
     <div class="md:px-4 px-1 h-16 rounded-xl bg-zinc-900 shadow-shape flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <MapPin class="size-5 text-zinc-400" />
+      <div class="flex items-center gap-2 min-w-0">
+        <MapPin class="size-5 text-zinc-400 shrink-0" />
         <input
           v-model="localDestination"
           :readonly="!isEditing"
@@ -10,6 +10,14 @@
           class="text-zinc-100 focus:outline-none focus:border-lime-300 bg-transparent w-full"
           placeholder="Destino"
         />
+        <span
+          v-if="role"
+          class="hidden md:inline-flex items-center gap-1.5 shrink-0 rounded-full px-3 py-1 text-xs font-medium border"
+          :class="roleStyle"
+        >
+          <component :is="roleIcon" class="size-3.5" />
+          {{ roleLabel }}
+        </span>
       </div>
       <div class="flex items-center gap-5">
         <div class="flex items-center gap-2">
@@ -41,7 +49,7 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue';
-import { Settings2, MapPin, Calendar } from "lucide-vue-next";
+import { Settings2, MapPin, Calendar, Crown, CircleCheck, CircleDashed } from "lucide-vue-next";
 import { ptBR } from 'date-fns/locale';
 import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
@@ -56,6 +64,31 @@ const isSaving = ref(false);
 const errorMessage = ref('');
 
 const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
+
+/** Papel do usuário nesta viagem: organizador, convidado confirmado ou convite pendente */
+const role = computed(() => {
+  const trip = tripStore.trip;
+  if (!trip || !auth.user) return null;
+  if (trip.ownerId === auth.user.id) return 'owner';
+  const me = trip.participants?.find((p) => p.accountId === auth.user.id);
+  if (!me) return null;
+  return me.isConfirmed ? 'guest' : 'pending';
+});
+
+const roleLabel = computed(
+  () => ({ owner: 'Organizador', guest: 'Convidado', pending: 'Convite pendente' })[role.value] ?? '',
+);
+const roleIcon = computed(
+  () => ({ owner: Crown, guest: CircleCheck, pending: CircleDashed })[role.value],
+);
+const roleStyle = computed(
+  () =>
+    ({
+      owner: 'bg-lime-300/15 text-lime-300 border-lime-300/30',
+      guest: 'bg-zinc-800 text-zinc-300 border-zinc-700',
+      pending: 'bg-zinc-800 text-zinc-400 border-dashed border-zinc-600',
+    })[role.value] ?? '',
+);
 
 const localDestination = ref(tripStore.trip?.destination ?? '');
 const localDate = ref([]);

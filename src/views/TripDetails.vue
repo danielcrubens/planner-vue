@@ -1,5 +1,5 @@
 <template>
-  <div class="md:max-w-6xl md:px-6 px-3 py-10 mx-auto md:space-x-8">
+  <div class="md:max-w-6xl md:px-6 px-3 pt-16 pb-6 mx-auto md:space-x-8">
     <UserMenu />
 
     <p v-if="tripStore.isLoading" class="text-zinc-400 py-10">Carregando viagem...</p>
