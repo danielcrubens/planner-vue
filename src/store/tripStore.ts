@@ -91,5 +91,9 @@ export function errorMessage(e: unknown): string {
       return Array.isArray(data.message) ? data.message.join(', ') : data.message;
     }
   }
+  // erro sem resposta (exceção local / rede): mensagem real em dev, genérica em prod
+  if (e instanceof Error && e.message && import.meta.env.DEV) {
+    return `Erro inesperado: ${e.message}`;
+  }
   return 'Não foi possível concluir a operação. Tente novamente.';
 }
