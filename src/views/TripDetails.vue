@@ -20,7 +20,7 @@
               Cadastrar atividade
             </button>
           </div>
-          <Activities :activities="trip.activities" @edit="onEditActivity" />
+          <Activities :activities="trip.activities" :highlight-id="highlightActivity" @edit="onEditActivity" />
         </div>
         <div class="w-80 space-y-6">
           <ImportantLinks />
@@ -59,6 +59,7 @@ const auth = useAuthStore();
 
 const trip = computed(() => tripStore.trip);
 const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
+const highlightActivity = computed(() => route.query.activity);
 const isCreateActivityModalOpen = ref(false);
 const editingActivity = ref(null);
 

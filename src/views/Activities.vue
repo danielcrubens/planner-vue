@@ -7,8 +7,10 @@
       </div>
       <div
         v-for="activity in day.activities"
+        :id="'activity-' + activity.id"
         :key="activity.id"
-        class="px-4 py-2.5 bg-zinc-900 rounded-xl shadow-shape flex items-center gap-3"
+        class="px-4 py-2.5 bg-zinc-900 rounded-xl shadow-shape flex items-center gap-3 transition-colors"
+        :class="{ 'ring-1 ring-lime-300/70 bg-zinc-800': activity.id === highlightId }"
       >
         <CircleCheck class="size-5 text-lime-300 shrink-0" />
         <span class="text-zinc-100">{{ activity.title }}</span>
@@ -38,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { CircleCheck, Pencil, Trash2 } from "lucide-vue-next";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -48,7 +50,7 @@ import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
 import { errorMessage as toMessage } from '@/store/tripStore';
 
-const props = defineProps<ActivityListProps>();
+const props = defineProps<ActivityListProps & { highlightId?: string }>();
 const emit = defineEmits<{ (e: 'edit', activity: ApiActivity): void }>();
 const tripStore = useTripStore();
 const auth = useAuthStore();
@@ -57,6 +59,20 @@ const isRemoving = ref('');
 const removeError = ref('');
 
 const isOwner = computed(() => tripStore.trip?.ownerId === auth.user?.id);
+
+// rola até a atividade destacada (link de notificação: /trips/:id?activity=<id>)
+watch(
+  () => [props.highlightId, props.activities.length] as const,
+  ([highlightId]) => {
+    if (!highlightId) return;
+    nextTick(() => {
+      setTimeout(() => {
+        document.getElementById(`activity-${highlightId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 300);
+    });
+  },
+  { immediate: true },
+);
 
 const removeActivity = async (activity: ApiActivity) => {
   if (!window.confirm(`Excluir a atividade "${activity.title}"?`)) return;
