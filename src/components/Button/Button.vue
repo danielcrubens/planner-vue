@@ -19,7 +19,7 @@ const props = defineProps({
     type: String,
     default: 'primary',
     validator(value) {
-      return ['primary', 'secondary'].includes(value);
+      return ['primary', 'secondary', 'ghost'].includes(value);
     },
   },
   size: {
@@ -34,6 +34,7 @@ const props = defineProps({
 const variantclass = computed(() => ({
   'bg-lime-300 text-lime-950 hover:bg-lime-400': props.variant === 'primary',
   'bg-zinc-800 text-zinc-200 hover:bg-zinc-700': props.variant === 'secondary',
+  'bg-transparent': props.variant === 'ghost',
 }));
 
 const sizeclass = computed(() => ({

@@ -31,14 +31,15 @@
               <span class="text-zinc-300 text-sm truncate">{{ guest.email }}</span>
               <CircleCheck v-if="guest.isConfirmed" class="text-lime-300 size-4 shrink-0" />
               <CircleDashed v-else class="text-zinc-400 size-4 shrink-0" />
-              <button
+              <Button
                 v-if="isOwner"
-                type="button"
+                variant="ghost"
+                type="Button"
                 :disabled="isRemoving === guest.id"
                 @click="removeGuest(guest.id)"
               >
                 <X class="size-4 text-zinc-400 hover:text-zinc-200" />
-              </button>
+              </Button>
             </div>
             <span v-if="guests.length === 0" class="block text-sm text-zinc-400">
               Nenhum convidado ainda.

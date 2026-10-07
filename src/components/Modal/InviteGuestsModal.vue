@@ -4,9 +4,9 @@
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">Selecionar convidados</h2>
-          <button @click="$emit('closer')">
+          <Button variant="ghost" @click="$emit('closer')">
             <X class="size-5 text-zinc-400" />
-          </button>
+          </Button>
         </div>
         <p class="text-sm text-zinc-400">
           Os convidados irão receber e-mails para confirmar a participação na viagem.
@@ -15,9 +15,9 @@
       <div class="flex flex-wrap gap-2">
         <div v-for="email in props.emailsToInvite" :key="email" class="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2">
           <span class="text-zinc-300">{{ email }}</span>
-          <button @click="$emit('removeEmailFromInvites', email)" type="button">
+          <Button variant="ghost" @click="$emit('removeEmailFromInvites', email)" type="Button">
             <X class="size-4 text-zinc-400" />
-          </button>
+          </Button>
         </div>
       </div>
       <div class="w-full h-px bg-zinc-800" />
@@ -34,11 +34,11 @@
             {{ validationError }}
           </div>
         </div>
-        <button type="submit"
-          class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 mt-4 lg:mt-0 font-medium flex items-center gap-2 hover:bg-lime-400">
-          Enviar convite
+        <Button type="submit"
+          class="bg-lime-300 text-lime-950 rounded-lg justify-center px-5 py-2 mt-4 lg:mt-0 font-medium flex items-center gap-2 hover:bg-lime-400">
           <Plus class="size-5" />
-        </button>
+          Enviar convite
+        </Button>
       </form>
     </div>
   </div>
@@ -57,6 +57,7 @@ import { AtSign, Plus, X } from "lucide-vue-next";
 import { ref } from 'vue';
 import { z } from 'zod';
 import { InviteGuestsModalProps } from '../../types/InviteGuestsModal';
+import Button from '@/components/Button/Button.vue';
 
 const validationSchema = z.object({
   email: z.string().email({ message: "O e-mail fornecido não é válido" }),

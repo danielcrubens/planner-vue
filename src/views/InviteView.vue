@@ -11,15 +11,15 @@
       <div v-else class="rounded-xl bg-zinc-900 shadow-shape p-6 space-y-4">
         <p :class="isFatal ? 'text-red-500' : 'text-zinc-300'">{{ message }}</p>
 
-        <button
+        <Button
           v-if="code === 'EMAIL_MISMATCH'"
-          type="button"
+          type="Button"
           class="w-full h-11 bg-lime-300 text-lime-950 rounded-lg font-medium hover:bg-lime-400 transition-colors"
           :disabled="isRetrying"
           @click="switchAccount"
         >
           {{ isRetrying ? 'Entrando...' : 'Entrar com o e-mail do convite' }}
-        </button>
+        </Button>
 
         <RouterLink
           v-else-if="code === 'INVITE_ALREADY_USED'"
@@ -45,6 +45,7 @@
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter, RouterLink } from 'vue-router';
 import { useAuthStore } from '@/store/authStore';
+import Button from '@/components/Button/Button.vue';
 
 const route = useRoute();
 const router = useRouter();

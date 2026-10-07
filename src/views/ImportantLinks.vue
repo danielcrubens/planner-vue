@@ -19,9 +19,9 @@
             <a :href="link.url" target="_blank" rel="noopener noreferrer">
               <Link2 class="text-zinc-400 size-5 hover:text-zinc-200" />
             </a>
-            <button v-if="isOwner" type="button" @click="removeLink(link.id)">
+            <Button v-if="isOwner" type="Button" @click="removeLink(link.id)">
               <X class="text-zinc-400 size-4 hover:text-zinc-200" />
-            </button>
+            </Button>
           </div>
         </div>
         <p v-if="links.length === 0" class="text-sm text-zinc-400">Nenhum link cadastrado ainda.</p>

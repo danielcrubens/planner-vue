@@ -3,13 +3,13 @@
     <div class="w-full max-w-md rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
       <div class="flex items-center justify-between">
         <h2 class="font-semibold">Entrar na aplicação</h2>
-        <button @click="$emit('closer')">
+        <Button variant="ghost" @click="$emit('closer')">
           <X class="size-5 text-zinc-400" />
-        </button>
+        </Button>
       </div>
 
-      <button
-        type="button"
+      <Button
+        type="Button"
         class="w-full h-14 px-4 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center gap-3 text-zinc-100 font-medium hover:bg-zinc-800 transition-colors"
         @click="goGoogle"
       >
@@ -20,7 +20,7 @@
           <path fill="#34A853" d="M12 23.25c3.04 0 5.6-1 7.46-2.72l-3.68-2.85c-1.02.69-2.33 1.1-3.78 1.1-2.97 0-5.46-2.1-6.36-4.97l-3.66 2.84C3.84 20.73 7.62 23.25 12 23.25z" />
         </svg>
         Entrar com Google
-      </button>
+      </Button>
 
       <div class="flex items-center gap-3 text-zinc-500 text-xs">
         <div class="h-px flex-1 bg-zinc-800" />

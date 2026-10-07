@@ -1,5 +1,5 @@
 <template>
-  <div class="md:max-w-6xl md:px-6 px-3 pt-16 pb-6 mx-auto md:space-x-8">
+  <div class="md:max-w-6xl md:px-6 px-3 lg:pt-16 pt-28  pb-6 mx-auto md:space-x-8">
     <UserMenu />
 
     <p v-if="tripStore.isLoading" class="text-zinc-400 py-10">Carregando viagem...</p>
@@ -15,14 +15,14 @@
         <div class="flex-1 space-y-6">
           <div class="flex items-center justify-between">
             <h2 class="md:text-3xl text-2xl font-semibold">Atividades</h2>
-            <button v-if="isOwner" @click="openCreateActivityModal" class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
+            <Button v-if="isOwner" @click="openCreateActivityModal" class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
               <Plus class="size-5" />
               Cadastrar atividade
-            </button>
+            </Button>
           </div>
           <Activities :activities="trip.activities" :highlight-id="highlightActivity" @edit="onEditActivity" />
         </div>
-        <div class="w-80 space-y-6">
+        <div class="lg:w-80 space-y-6">
           <ImportantLinks />
           <div class="w-full h-px bg-zinc-800" />
           <Guests />
@@ -52,6 +52,7 @@ import CreateActivity from "../components/Modal/CreateActivity.vue";
 import UserMenu from '@/components/UserMenu.vue';
 import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
+import Button from "@/components/Button/Button.vue";
 
 const route = useRoute();
 const tripStore = useTripStore();

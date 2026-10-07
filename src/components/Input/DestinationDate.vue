@@ -28,18 +28,18 @@
       <div v-if="errorMessageDate" class="text-red-500 px-2 text-xs absolute -bottom-0">{{ errorMessageDate }}</div>
     </div>
 
-    <button
+    <Button
       v-if="props.isGuestsInputOpen"
       @click="closeGuestsInput"
       class="bg-zinc-800 text-zinc-200 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-zinc-700"
     >
       Alterar local/data
       <Settings2 class="size-5" />
-    </button>
+    </Button>
 
     <button v-else
       @click="handleContinue"
-      class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
+      class="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex justify-center  items-center gap-2 hover:bg-lime-400"
     >
       Continuar
       <ArrowRight class="size-5" />
@@ -54,6 +54,7 @@ import { z } from 'zod';
 import { ptBR } from 'date-fns/locale';
 import { useAuthStore } from '@/store/authStore';
 import { DestinationDateProps } from '../../types/DestinationDate';
+import Button from '@/components/Button/Button.vue';
 
 const formatLocale = ptBR;
 

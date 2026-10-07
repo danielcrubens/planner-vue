@@ -16,17 +16,18 @@
         <span class="text-zinc-100">{{ activity.title }}</span>
         <span class="text-zinc-400 text-sm ml-auto">{{ formatHour(activity.occursAt) }}</span>
         <template v-if="isOwner">
-          <button type="button" @click="$emit('edit', activity)" aria-label="Editar atividade">
+          <Button variant="ghost" type="Button" @click="$emit('edit', activity)" aria-label="Editar atividade">
             <Pencil class="size-4 text-zinc-400 hover:text-zinc-200" />
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            type="Button"
             :disabled="isRemoving === activity.id"
             @click="removeActivity(activity)"
             aria-label="Excluir atividade"
           >
             <Trash2 class="size-4 text-zinc-400 hover:text-red-400" />
-          </button>
+          </Button>
         </template>
       </div>
     </div>
@@ -49,6 +50,7 @@ import type { ApiActivity } from '@/types/api';
 import { useTripStore } from '@/store/tripStore';
 import { useAuthStore } from '@/store/authStore';
 import { errorMessage as toMessage } from '@/store/tripStore';
+import Button from '@/components/Button/Button.vue';
 
 const props = defineProps<ActivityListProps & { highlightId?: string }>();
 const emit = defineEmits<{ (e: 'edit', activity: ApiActivity): void }>();

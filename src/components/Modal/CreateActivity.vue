@@ -4,9 +4,9 @@
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">{{ activityToEdit ? 'Editar atividade' : 'Cadastrar atividade' }}</h2>
-          <button>
+          <Button variant="ghost">
             <X class="size-5 text-zinc-400" @click="$emit('closeCreateActivityModal')" />
-          </button>
+          </Button>
         </div>
         <p class="text-sm text-zinc-400">
           Todos convidados podem visualizar as atividades.
@@ -187,7 +187,7 @@ const tripPeriod = computed(() => {
   color: #e4e0e0 !important;
   font-weight: 300;
 }
-.dp__btn.dp__button.dp__button_bottom {
+.dp__btn.dp__Button.dp__Button_bottom {
   visibility: hidden;
 
 }
@@ -207,7 +207,7 @@ const tripPeriod = computed(() => {
   --dp-disabled-color-text: #d0d0d0;
 }
 
-.dp__action_buttons {
+.dp__action_Buttons {
   display: block;
   flex: auto;
   white-space: nowrap;

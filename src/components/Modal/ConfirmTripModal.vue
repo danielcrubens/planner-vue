@@ -4,9 +4,9 @@
       <div class="space-y-2">
         <div class="flex items-center justify-between">
           <h2 class="font-lg font-semibold">Confirmar criação de viagem</h2>
-          <button>
+          <Button>
             <X class="size-5 text-zinc-400" @click="$emit('closeConfirmTripModal')" />
-          </button>
+          </Button>
         </div>
         <p class="text-sm text-zinc-400">
           Para concluir a criação da viagem para
@@ -21,7 +21,7 @@
 
       <p v-if="errorMessage" class="text-red-500 text-xs">{{ errorMessage }}</p>
 
-      <Button type="button" variant="primary" :disabled="isSubmitting" @click="$emit('confirmTrip')">
+      <Button type="Button" variant="primary" :disabled="isSubmitting" @click="$emit('confirmTrip')">
         {{ isSubmitting ? 'Criando viagem...' : 'Confirmar criação da viagem' }}
       </Button>
     </div>
