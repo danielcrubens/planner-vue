@@ -42,6 +42,7 @@
         </div>
         <p v-if="submitError" class="text-red-500 text-xs">{{ submitError }}</p>
         <Button type="submit" variant="primary" size="full" :disabled="isSubmitting">
+          <Save class="size-5" />
           {{ isSubmitting ? 'Salvando...' : activityToEdit ? 'Salvar alterações' : 'Salvar atividade' }}
         </Button>
       </form>
@@ -50,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { Tag, X, Calendar, Clock3 } from "lucide-vue-next";
+import { Tag, X, Calendar, Clock3, Save } from "lucide-vue-next";
 import Button from "@/components/Button/Button.vue";
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';

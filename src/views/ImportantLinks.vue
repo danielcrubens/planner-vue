@@ -55,6 +55,7 @@
           <div v-if="formError" class="text-red-500 px-2 text-xs absolute -bottom-1">{{ formError }}</div>
         </div>
         <Button type="submit" variant="primary" size="full" :disabled="isSaving">
+          <Save class="size-5" />
           {{ isSaving ? 'Salvando...' : 'Salvar link' }}
         </Button>
       </form>
@@ -63,7 +64,7 @@
 
 <script setup>
   import { computed, reactive, ref } from "vue";
-  import { Plus, Link2, X, CalendarClock } from "lucide-vue-next";
+  import { Plus, Link2, X, CalendarClock, Save } from "lucide-vue-next";
   import Button from "../components/Button/Button.vue";
   import { useTripStore } from '@/store/tripStore';
   import { useAuthStore } from '@/store/authStore';
